@@ -1,0 +1,43 @@
+# Dependency policy, checked by `just deny` (part of `just lint`).
+# Reference: https://embarkstudios.github.io/cargo-deny/checks/cfg.html
+
+# cargo-deny only checks dependencies of the targets listed here, so every
+# platform Bifrost ships on is listed or its platform-only crates go unchecked.
+[graph]
+targets = [
+    "x86_64-unknown-linux-gnu",
+    "aarch64-unknown-linux-gnu",
+    "x86_64-pc-windows-msvc",
+    "x86_64-apple-darwin",
+    "aarch64-apple-darwin",
+    "aarch64-linux-android",
+]
+
+[advisories]
+yanked = "deny"
+
+# Permissive licenses only. Copyleft is added per dependency, with a reason, in its own pull request.
+[licenses]
+allow = [
+    "MIT",
+    "Apache-2.0",
+    "Apache-2.0 WITH LLVM-exception",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "ISC",
+    "Unicode-3.0",
+    "Zlib",
+]
+
+[bans]
+# Platform crates often pull two versions of the same crate (windows-sys), so duplicates only warn.
+multiple-versions = "warn"
+wildcards = "deny"
+# The workspace crates are publish = false, which is what lets their path dependencies pass.
+allow-wildcard-paths = true
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+allow-git = []
