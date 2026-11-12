@@ -38,64 +38,99 @@ pub fn findings(root: &Path, denied: &[String]) -> Result<Vec<String>, Error> {
     }
     let metadata: Value = serde_json::from_slice(&output.stdout)
         .map_err(|source| Error::Metadata(source.to_string()))?;
-    reached(&Graph::parse(&metadata), denied)
+    findings_in(&metadata, denied)
+}
+
+/// Like [`findings`], on metadata that was already read.
+///
+/// # Errors
+///
+/// Returns [`Error::Metadata`] when the metadata lacks the packages, the
+/// resolved graph or the workspace members, or when `bifrost-core` is not
+/// exactly one workspace member. A graph that cannot be read never passes.
+pub fn findings_in(metadata: &Value, denied: &[String]) -> Result<Vec<String>, Error> {
+    reached(&Graph::parse(metadata)?, denied)
 }
 
 /// The resolved dependency graph, keyed by package id.
 struct Graph {
     names: HashMap<String, String>,
     edges: HashMap<String, Vec<String>>,
+    members: Vec<String>,
 }
 
 impl Graph {
-    fn parse(metadata: &Value) -> Self {
-        let names = list(metadata, "packages")
-            .filter_map(|package| Some((text(package, "id")?, text(package, "name")?)))
-            .collect();
-        let edges = metadata
-            .get("resolve")
-            .map(|resolve| list(resolve, "nodes"))
-            .into_iter()
-            .flatten()
-            .filter_map(|node| Some((text(node, "id")?, dependencies(node))))
-            .collect();
-        Self { names, edges }
+    fn parse(metadata: &Value) -> Result<Self, Error> {
+        let names = required(metadata, "packages")?
+            .iter()
+            .map(|package| Ok((string(package, "id")?, string(package, "name")?)))
+            .collect::<Result<_, Error>>()?;
+        let resolve = metadata.get("resolve").ok_or_else(|| missing("resolve"))?;
+        let edges = required(resolve, "nodes")?
+            .iter()
+            .map(|node| Ok((string(node, "id")?, dependencies(node)?)))
+            .collect::<Result<_, Error>>()?;
+        let members = required(metadata, "workspace_members")?
+            .iter()
+            .map(|member| member.as_str().map(str::to_owned))
+            .collect::<Option<_>>()
+            .ok_or_else(|| missing("workspace_members"))?;
+        Ok(Self {
+            names,
+            edges,
+            members,
+        })
     }
 
     fn name<'a>(&'a self, key: &'a str) -> &'a str {
         self.names.get(key).map_or(key, String::as_str)
     }
 
-    fn id_of(&self, package: &str) -> Option<&String> {
-        self.names
+    /// The id of the one workspace member called `package`.
+    fn member(&self, package: &str) -> Result<&str, Error> {
+        let mut matching = self
+            .members
             .iter()
-            .find_map(|(key, name)| (name == package).then_some(key))
+            .filter(|member| self.name(member) == package);
+        match (matching.next(), matching.next()) {
+            (Some(member), None) => Ok(member),
+            _ => Err(Error::Metadata(format!(
+                "`{package}` is not exactly one workspace member"
+            ))),
+        }
     }
 }
 
-fn list<'a>(value: &'a Value, key: &str) -> impl Iterator<Item = &'a Value> {
+fn missing(key: &str) -> Error {
+    Error::Metadata(format!("the metadata has no usable `{key}`"))
+}
+
+fn required<'a>(value: &'a Value, key: &str) -> Result<&'a [Value], Error> {
     value
         .get(key)
         .and_then(Value::as_array)
-        .into_iter()
-        .flatten()
+        .map(Vec::as_slice)
+        .ok_or_else(|| missing(key))
 }
 
-fn text(value: &Value, key: &str) -> Option<String> {
-    value.get(key)?.as_str().map(str::to_owned)
+fn string(value: &Value, key: &str) -> Result<String, Error> {
+    value
+        .get(key)
+        .and_then(Value::as_str)
+        .map(str::to_owned)
+        .ok_or_else(|| missing(key))
 }
 
-fn dependencies(node: &Value) -> Vec<String> {
-    list(node, "deps")
-        .filter_map(|dependency| text(dependency, "pkg"))
+fn dependencies(node: &Value) -> Result<Vec<String>, Error> {
+    required(node, "deps")?
+        .iter()
+        .map(|dependency| string(dependency, "pkg"))
         .collect()
 }
 
 /// Walks everything `bifrost-core` depends on and reports the denied crates.
 fn reached(graph: &Graph, denied: &[String]) -> Result<Vec<String>, Error> {
-    let start = graph
-        .id_of(PROTECTED)
-        .ok_or_else(|| Error::Metadata(format!("package `{PROTECTED}` not found")))?;
+    let start = graph.member(PROTECTED)?;
     let parents = shortest_parents(graph, start);
     let mut found: Vec<String> = parents
         .keys()

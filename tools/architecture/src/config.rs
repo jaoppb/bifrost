@@ -11,10 +11,9 @@ pub const CORE_RULE: &str = "core-stays-platform-independent";
 
 const GLOB_SUFFIX: &str = "::**";
 
-/// Returns the Cargo package patterns denied to `bifrost-core`.
-///
-/// A source path such as `objc2_foundation::**` becomes `objc2-foundation`;
-/// a trailing `*` in the crate part is kept and matches by prefix.
+/// Returns the crate patterns denied to `bifrost-core`, as written in the
+/// source paths: `objc2_foundation::**` gives `objc2_foundation`, and a
+/// trailing `*` in the crate part matches by prefix.
 ///
 /// # Errors
 ///
@@ -44,14 +43,18 @@ fn crate_pattern(entry: &toml::Value) -> Result<String, Error> {
         .as_str()
         .ok_or_else(|| Error::Config(format!("`deny` of `{CORE_RULE}` holds a non-string")))?;
     path.strip_suffix(GLOB_SUFFIX)
-        .map(|name| name.replace('_', "-"))
+        .map(str::to_owned)
         .ok_or_else(|| Error::Config(format!("`{path}` must end with `{GLOB_SUFFIX}`")))
 }
 
-/// Tells whether a package name is covered by one of the denied patterns.
+/// Tells whether a Cargo package name is covered by one of the denied
+/// patterns. Cargo treats `-` and `_` in a name as the same character, so
+/// both sides are compared with `-` written as `_`.
 #[must_use]
 pub fn is_denied(denied: &[String], package: &str) -> bool {
+    let package = package.replace('-', "_");
     denied.iter().any(|pattern| {
+        let pattern = pattern.replace('-', "_");
         pattern
             .strip_suffix('*')
             .map_or(pattern == package, |prefix| package.starts_with(prefix))

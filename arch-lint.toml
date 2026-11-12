@@ -19,22 +19,25 @@ paths = ["tools/*/src/**"]
 
 # The deny list doubles as the list of crates bifrost-core may not depend on:
 # tools/architecture reads it from this rule, so the rule name is part of its contract.
-# Source paths use underscores where Cargo names use hyphens.
+# Write crate names as in source paths (underscores); Cargo's hyphens match too.
+# A trailing `*` covers a family (`windows_*` is windows-sys, windows-core, ...).
 [[restrict-use]]
 name = "core-stays-platform-independent"
 scope = "core"
 deny = [
     # Platform crates.
     "windows::**",
-    "windows_sys::**",
-    "windows_core::**",
+    "windows_*::**",
     "objc2::**",
     "objc2_*::**",
     "core_foundation::**",
+    "core_foundation_*::**",
     "jni::**",
     "wayland_*::**",
     "zbus::**",
+    "zbus_*::**",
     "dbus::**",
+    "dbus_*::**",
     # Crates above core in the dependency order.
     "bifrostd::**",
     "lint_policy::**",
@@ -43,6 +46,7 @@ deny = [
 message = "bifrost-core must stay platform independent and must not use the crates built on it"
 severity = "error"
 
+# Source rule only: unlike the core rule above, it is not mirrored on the Cargo graph.
 [[restrict-use]]
 name = "tools-do-not-use-the-product"
 scope = "tools"

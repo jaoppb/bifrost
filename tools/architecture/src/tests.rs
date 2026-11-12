@@ -2,6 +2,7 @@ use std::fs;
 use std::path::Path;
 
 use crate::config::{denied_crates, is_denied};
+use crate::graph::findings_in;
 use crate::{CONFIG_FILE, Error, check};
 
 const REAL_CONFIG: &str = include_str!("../../../arch-lint.toml");
@@ -145,11 +146,12 @@ fn a_missing_config_cannot_be_checked() {
 #[test]
 fn the_deny_list_becomes_cargo_names() {
     let denied = denied_crates(REAL_CONFIG).unwrap();
-    assert!(denied.contains(&"windows-sys".to_owned()));
-    assert!(denied.contains(&"objc2-*".to_owned()));
+    assert!(denied.contains(&"windows_*".to_owned()));
+    assert!(denied.contains(&"objc2_*".to_owned()));
     assert!(is_denied(&denied, "objc2-app-kit"));
-    assert!(is_denied(&denied, "windows"));
-    assert!(!is_denied(&denied, "windows-future"));
+    assert!(is_denied(&denied, "windows-sys"));
+    assert!(is_denied(&denied, "core-foundation-sys"));
+    assert!(!is_denied(&denied, "window"));
     assert!(!is_denied(&denied, "serde"));
 }
 
@@ -166,4 +168,60 @@ fn a_deny_entry_that_is_not_a_crate_glob_is_rejected() {
     let config =
         "[[restrict-use]]\nname = \"core-stays-platform-independent\"\ndeny = [\"windows\"]\n";
     assert!(matches!(denied_crates(config), Err(Error::Config(_))));
+}
+
+#[test]
+fn a_config_that_is_not_toml_is_rejected() {
+    assert!(matches!(denied_crates("[[[\n"), Err(Error::Config(_))));
+}
+
+#[test]
+fn a_deny_entry_that_is_not_a_string_is_rejected() {
+    let config = "[[restrict-use]]\nname = \"core-stays-platform-independent\"\ndeny = [1]\n";
+    assert!(matches!(denied_crates(config), Err(Error::Config(_))));
+}
+
+#[test]
+fn metadata_without_a_resolved_graph_does_not_pass() {
+    let metadata = serde_json::json!({
+        "packages": [{ "id": "core 0.1.0", "name": "bifrost-core" }],
+        "workspace_members": ["core 0.1.0"],
+        "resolve": null,
+    });
+    assert!(matches!(
+        findings_in(&metadata, &[]),
+        Err(Error::Metadata(_))
+    ));
+}
+
+#[test]
+fn a_node_without_dependencies_does_not_pass() {
+    let metadata = serde_json::json!({
+        "packages": [{ "id": "core 0.1.0", "name": "bifrost-core" }],
+        "workspace_members": ["core 0.1.0"],
+        "resolve": { "nodes": [{ "id": "core 0.1.0" }] },
+    });
+    assert!(matches!(
+        findings_in(&metadata, &[]),
+        Err(Error::Metadata(_))
+    ));
+}
+
+#[test]
+fn two_workspace_members_called_core_do_not_pass() {
+    let metadata = serde_json::json!({
+        "packages": [
+            { "id": "one 0.1.0", "name": "bifrost-core" },
+            { "id": "two 0.1.0", "name": "bifrost-core" },
+        ],
+        "workspace_members": ["one 0.1.0", "two 0.1.0"],
+        "resolve": { "nodes": [
+            { "id": "one 0.1.0", "deps": [] },
+            { "id": "two 0.1.0", "deps": [] },
+        ] },
+    });
+    assert!(matches!(
+        findings_in(&metadata, &[]),
+        Err(Error::Metadata(_))
+    ));
 }

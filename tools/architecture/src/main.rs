@@ -19,9 +19,7 @@ fn main() -> ExitCode {
 }
 
 fn report(text: &str, code: u8) -> ExitCode {
-    let mut stderr = std::io::stderr().lock();
-    let written = stderr
-        .write_all(text.as_bytes())
-        .and_then(|()| stderr.write_all(b"\n"));
-    written.map_or_else(|_| ExitCode::from(code), |()| ExitCode::from(code))
+    // Nowhere to report a failure to write to stderr, so the exit code carries it.
+    writeln!(std::io::stderr().lock(), "{text}").ok();
+    ExitCode::from(code)
 }
