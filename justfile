@@ -10,9 +10,9 @@ eager _devshell := if env("BIFROST_DEVSHELL", "") == "" { error("run just inside
 default:
     @just --list
 
-# Set up the local environment (placeholder: hooks arrive with #11).
+# Install the git hooks (worktrees share one hooks directory, so one run covers them all).
 setup:
-    @echo 'setup: nothing to install yet (git hooks arrive with #11)'
+    lefthook install
 
 # Format Rust and Markdown in place.
 fmt:
@@ -24,9 +24,12 @@ fmt-check:
     cargo fmt --all --check
     rumdl check .
 
-# Lint Rust with clippy (warnings are errors), then check the dependency policy and the crate boundaries.
-lint:
+# Run clippy on the whole workspace (warnings are errors).
+clippy:
     cargo clippy --workspace --all-targets --all-features -- -D warnings
+
+# Run clippy, then check the dependency policy and the crate boundaries.
+lint: clippy
     just deny
     just arch
 
