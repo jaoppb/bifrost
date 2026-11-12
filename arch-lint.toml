@@ -1,0 +1,61 @@
+# Crate boundaries, checked by arch-lint through tools/architecture (`just arch`).
+# The Cargo graph is checked from the same deny list: see tools/architecture/src/graph.rs.
+# Spike #23 extends these rules to the final crate layout.
+
+# Only the boundary rules below run. clippy and the workspace lint table already
+# forbid what the built-in style rules check, and `minimal` enables only this one.
+preset = "minimal"
+
+[rules.no-unwrap-expect]
+enabled = false
+
+[[scopes]]
+name = "core"
+paths = ["crates/core/src/**"]
+
+[[scopes]]
+name = "tools"
+paths = ["tools/*/src/**"]
+
+# The deny list doubles as the list of crates bifrost-core may not depend on:
+# tools/architecture reads it from this rule, so the rule name is part of its contract.
+# Write crate names as in source paths (underscores); Cargo's hyphens match too.
+# Names are explicit: a `*` inside a crate name matches nothing in arch-lint, so
+# tools/architecture rejects it. A new platform crate needs a line here.
+[[restrict-use]]
+name = "core-stays-platform-independent"
+scope = "core"
+deny = [
+    # Platform crates.
+    "windows::**",
+    "windows_core::**",
+    "windows_link::**",
+    "windows_result::**",
+    "windows_sys::**",
+    "windows_targets::**",
+    "objc2::**",
+    "objc2_app_kit::**",
+    "objc2_foundation::**",
+    "core_foundation::**",
+    "core_foundation_sys::**",
+    "jni::**",
+    "wayland_backend::**",
+    "wayland_client::**",
+    "wayland_protocols::**",
+    "zbus::**",
+    "dbus::**",
+    # Crates above core in the dependency order.
+    "bifrostd::**",
+    "lint_policy::**",
+    "bifrost_architecture::**",
+]
+message = "bifrost-core must stay platform independent and must not use the crates built on it"
+severity = "error"
+
+# Source rule only: unlike the core rule above, it is not mirrored on the Cargo graph.
+[[restrict-use]]
+name = "tools-do-not-use-the-product"
+scope = "tools"
+deny = ["bifrost_core::**", "bifrostd::**"]
+message = "the tools check the workspace and must not use the product crates"
+severity = "error"

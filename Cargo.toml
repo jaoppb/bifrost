@@ -3,6 +3,7 @@ resolver = "3"
 members = [
     "crates/core",
     "crates/daemon",
+    "tools/architecture",
     "tools/lint-policy",
 ]
 
@@ -15,6 +16,9 @@ repository = "https://github.com/jaoppb/bifrost"
 publish = false
 
 [workspace.dependencies]
+# arch-lint is 0.x and breaks between releases, so it is pinned exactly.
+arch-lint = "=0.11.0"
+serde_json = "1"
 tempfile = "3"
 toml = "0.8"
 
