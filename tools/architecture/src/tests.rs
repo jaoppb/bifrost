@@ -146,8 +146,7 @@ fn a_missing_config_cannot_be_checked() {
 #[test]
 fn the_deny_list_becomes_cargo_names() {
     let denied = denied_crates(REAL_CONFIG).unwrap();
-    assert!(denied.contains(&"windows_*".to_owned()));
-    assert!(denied.contains(&"objc2_*".to_owned()));
+    assert!(denied.contains(&"windows_sys".to_owned()));
     assert!(is_denied(&denied, "objc2-app-kit"));
     assert!(is_denied(&denied, "windows-sys"));
     assert!(is_denied(&denied, "core-foundation-sys"));
@@ -167,6 +166,13 @@ fn a_config_without_the_core_rule_is_rejected() {
 fn a_deny_entry_that_is_not_a_crate_glob_is_rejected() {
     let config =
         "[[restrict-use]]\nname = \"core-stays-platform-independent\"\ndeny = [\"windows\"]\n";
+    assert!(matches!(denied_crates(config), Err(Error::Config(_))));
+}
+
+#[test]
+fn a_wildcard_in_a_crate_name_is_rejected() {
+    let config =
+        "[[restrict-use]]\nname = \"core-stays-platform-independent\"\ndeny = [\"objc2_*::**\"]\n";
     assert!(matches!(denied_crates(config), Err(Error::Config(_))));
 }
 
@@ -224,4 +230,17 @@ fn two_workspace_members_called_core_do_not_pass() {
         findings_in(&metadata, &[]),
         Err(Error::Metadata(_))
     ));
+}
+
+#[test]
+fn every_denied_crate_is_caught_in_core_source() {
+    let denied = denied_crates(REAL_CONFIG).unwrap();
+    let uses = denied
+        .iter()
+        .map(|name| "use ".to_owned() + name + "::Item;")
+        .collect::<Vec<_>>()
+        .join("\n");
+    let dir = workspace("", &uses);
+    let violations = crate::source::findings(dir.path(), REAL_CONFIG).unwrap();
+    assert_eq!(violations.len(), denied.len(), "{violations:?}");
 }
