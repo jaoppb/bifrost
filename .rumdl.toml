@@ -1,0 +1,9 @@
+# Markdown style for the whole repository. rumdl defaults apply, with prose
+# limited to 80 columns and wrapped by `rumdl fmt`. Gitignored paths (spdd/)
+# are skipped through .gitignore.
+[global]
+exclude = ["target", ".direnv"]
+
+[MD013]
+line-length = 80
+reflow = true

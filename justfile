@@ -14,13 +14,15 @@ default:
 setup:
     @echo 'setup: nothing to install yet (git hooks arrive with #11)'
 
-# Format Rust in place.
+# Format Rust and Markdown in place.
 fmt:
     cargo fmt --all
+    rumdl fmt .
 
-# Fail if Rust is not formatted.
+# Fail if Rust or Markdown is not formatted.
 fmt-check:
     cargo fmt --all --check
+    rumdl check .
 
 # Lint Rust with clippy, warnings are errors.
 lint:
