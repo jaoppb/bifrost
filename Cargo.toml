@@ -1,0 +1,56 @@
+[workspace]
+resolver = "3"
+members = [
+    "crates/core",
+    "crates/daemon",
+    "tools/lint-policy",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.99.1"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/jaoppb/bifrost"
+publish = false
+
+[workspace.dependencies]
+tempfile = "3"
+toml = "0.8"
+
+[workspace.lints.rust]
+unused = { level = "deny", priority = -1 }
+rust_2018_idioms = { level = "deny", priority = -1 }
+future_incompatible = { level = "deny", priority = -1 }
+unsafe_code = "forbid"
+missing_docs = "forbid"
+unreachable_pub = "forbid"
+missing_debug_implementations = "forbid"
+
+[workspace.lints.clippy]
+all = { level = "deny", priority = -1 }
+pedantic = { level = "deny", priority = -1 }
+nursery = { level = "deny", priority = -1 }
+cargo = { level = "deny", priority = -1 }
+allow_attributes = "forbid"
+allow_attributes_without_reason = "forbid"
+unwrap_used = "forbid"
+expect_used = "forbid"
+panic = "forbid"
+unwrap_in_result = "forbid"
+panic_in_result_fn = "forbid"
+get_unwrap = "forbid"
+indexing_slicing = "forbid"
+string_slice = "forbid"
+as_conversions = "forbid"
+float_arithmetic = "forbid"
+arithmetic_side_effects = "forbid"
+print_stdout = "forbid"
+print_stderr = "forbid"
+dbg_macro = "forbid"
+todo = "forbid"
+unimplemented = "forbid"
+unreachable = "forbid"
+cognitive_complexity = "forbid"
+min_ident_chars = "forbid"
+self_named_module_files = "forbid"
