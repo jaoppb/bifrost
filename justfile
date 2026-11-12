@@ -24,10 +24,15 @@ fmt-check:
     cargo fmt --all --check
     rumdl check .
 
-# Lint Rust with clippy (warnings are errors) and check the dependency policy.
+# Lint Rust with clippy (warnings are errors), then check the dependency policy and the crate boundaries.
 lint:
     cargo clippy --workspace --all-targets --all-features -- -D warnings
     just deny
+    just arch
+
+# Check the crate boundaries: arch-lint on the sources and a guard on the Cargo graph.
+arch:
+    cargo run -q -p bifrost-architecture -- .
 
 # Check advisories, licenses, bans and sources. The advisory database is fetched first; if that fails
 # (offline, flaky network) the check uses the cached copy, and fails if there is none.

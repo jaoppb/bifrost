@@ -1,0 +1,51 @@
+# Crate boundaries, checked by arch-lint through tools/architecture (`just arch`).
+# The Cargo graph is checked from the same deny list: see tools/architecture/src/graph.rs.
+# Spike #23 extends these rules to the final crate layout.
+
+# Only the boundary rules below run. clippy and the workspace lint table already
+# forbid what the built-in style rules check, and `minimal` enables only this one.
+preset = "minimal"
+
+[rules.no-unwrap-expect]
+enabled = false
+
+[[scopes]]
+name = "core"
+paths = ["crates/core/src/**"]
+
+[[scopes]]
+name = "tools"
+paths = ["tools/*/src/**"]
+
+# The deny list doubles as the list of crates bifrost-core may not depend on:
+# tools/architecture reads it from this rule, so the rule name is part of its contract.
+# Source paths use underscores where Cargo names use hyphens.
+[[restrict-use]]
+name = "core-stays-platform-independent"
+scope = "core"
+deny = [
+    # Platform crates.
+    "windows::**",
+    "windows_sys::**",
+    "windows_core::**",
+    "objc2::**",
+    "objc2_*::**",
+    "core_foundation::**",
+    "jni::**",
+    "wayland_*::**",
+    "zbus::**",
+    "dbus::**",
+    # Crates above core in the dependency order.
+    "bifrostd::**",
+    "lint_policy::**",
+    "bifrost_architecture::**",
+]
+message = "bifrost-core must stay platform independent and must not use the crates built on it"
+severity = "error"
+
+[[restrict-use]]
+name = "tools-do-not-use-the-product"
+scope = "tools"
+deny = ["bifrost_core::**", "bifrostd::**"]
+message = "the tools check the workspace and must not use the product crates"
+severity = "error"
