@@ -22,9 +22,16 @@ fmt:
 fmt-check:
     cargo fmt --all --check
 
-# Lint Rust with clippy, warnings are errors.
+# Lint Rust with clippy (warnings are errors) and check the dependency policy.
 lint:
     cargo clippy --workspace --all-targets --all-features -- -D warnings
+    just deny
+
+# Check advisories, licenses, bans and sources. The advisory database is fetched first; if that fails
+# (offline, flaky network) the check uses the cached copy, and fails if there is none.
+deny:
+    cargo deny fetch || echo 'warning: could not update the advisory database, using the cached copy' >&2
+    cargo deny --workspace --offline check
 
 # Run the unit, integration and doc tests.
 test:
