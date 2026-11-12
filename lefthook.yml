@@ -15,8 +15,8 @@ pre-commit:
 commit-msg:
   jobs:
     - name: convco
-      # Titles git generates (merge, revert, fixup) are not conventional commits.
-      run: grep -qE '^(Merge |Revert "|(fixup|squash|amend)! )' {1} || convco check --strip --from-stdin < {1}
+      # Titles git generates (merge, revert, fixup, squash, amend) are not conventional commits.
+      run: head -n1 {1} | grep -qE '^(Merge |Revert "|(fixup|squash|amend)! )' || convco check --strip --from-stdin < {1}
 
 pre-push:
   jobs:
