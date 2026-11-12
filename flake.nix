@@ -28,6 +28,13 @@
 
           # One pin for the flake and for rustup users: rust-toolchain.toml.
           rustToolchain = pkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
+
+          # nixpkgs' convco is built against a system libgit2 that is missing from the pkg-config
+          # path, so its build fails (checked on nixos-unstable, 2026-11). Unsetting the flag makes
+          # libgit2-sys build its vendored copy. Drop the override once nixpkgs builds convco again.
+          convco-vendored-libgit2 = pkgs.convco.overrideAttrs (old: {
+            preBuild = "unset LIBGIT2_NO_VENDOR\n" + (old.preBuild or "");
+          });
         in
         {
           default = pkgs.mkShell {
@@ -39,6 +46,7 @@
             ] ++ (with pkgs; [
               just
               lefthook
+              convco-vendored-libgit2
               rumdl
               cargo-deny
               cargo-nextest
