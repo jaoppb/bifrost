@@ -31,6 +31,9 @@
         in
         {
           default = pkgs.mkShell {
+            # Checked by the justfile's `_devshell` guard: recipes run only inside this shell.
+            BIFROST_DEVSHELL = "1";
+
             packages = [
               rustToolchain
             ] ++ (with pkgs; [
