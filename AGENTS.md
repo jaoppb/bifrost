@@ -20,9 +20,9 @@ Project is set up.
 - Never claim a check that does not run. Where an enforcer is missing, the
   status says so.
 - There are no lint exceptions: no `allow` or `expect` attributes and no
-  arch-lint suppressions anywhere (the suppressions are review-only, section
-  3). Code is redesigned to fit, or the rule is
-  changed for everyone in a pull request that says why.
+  arch-lint suppressions anywhere (`allow` is checked, `expect` and suppressions
+  are review-only, section 3). Code is redesigned to fit, or the rule is changed
+  for everyone in a pull request that says why.
 
 ## 2. Architecture
 
@@ -64,7 +64,7 @@ environment builds with the same compiler. Lints are declared once in
 | No printing or `dbg!` outside tests | clippy `print_stdout`, `print_stderr` and `dbg_macro` at `forbid` | enforced now |
 | No floating point or unchecked integer arithmetic | clippy `float_arithmetic` and `arithmetic_side_effects` at `forbid` | enforced now |
 | Functions of at most 25 lines and 3 parameters, cognitive complexity at most 8, no boolean flags in signatures or structs, identifiers of three or more characters | clippy `too_many_lines`, `too_many_arguments`, `cognitive_complexity`, `fn_params_excessive_bools`, `struct_excessive_bools` and `min_ident_chars`, with thresholds in `clippy.toml` | enforced now |
-| No lint exceptions: no `allow` or `expect` attributes | clippy `allow_attributes` and `allow_attributes_without_reason` at `forbid` | enforced now for attributes; arch-lint suppressions are not scanned |
+| No lint exceptions: no `allow` or `expect` attributes, no arch-lint suppressions | clippy `allow_attributes` and `allow_attributes_without_reason` at `forbid` | enforced now for `allow`; review-only for `expect` and arch-lint suppressions, which no check flags |
 | Dependencies pass the policy: permissive licenses, no advisories or yanked versions, no wildcard versions, crates.io only | `just deny` (`cargo deny`), part of `just lint` | enforced now |
 | Shared dependency versions live in `[workspace.dependencies]`, and a 0.x dependency that breaks between releases is pinned exactly | Code review of manifests | review-only: no manifest check exists |
 | One error type per module boundary, never a leaked foreign error | Code review | review-only: mapping quality needs judgement |
@@ -129,7 +129,7 @@ are in `just test`.
 | Merge commits only, the pull request title and body as the merge message, the branch deleted on merge | `[github.repository.settings]` in `tools.toml`, compared by `just repo-check` | enforced by hand |
 | Markdown is formatted and linted | `rumdl` through `just fmt-check` | enforced now |
 | An issue with Effort 5 or more has its analysis before code | Code review | review-only: the analysis lives in the issue body, which `just check` cannot reach |
-| No canvas committed or named by path | `spdd/` in `.gitignore` for the files; code review for the text | enforced now for files; review-only for text |
+| No canvas committed or named by path | `spdd/` in `.gitignore` keeps the files out of an accidental `git add`; code review for the rest | review-only: `git add -f` bypasses the ignore |
 | Documentation describes only what exists | Code review | review-only |
 
 ## 6. Commands

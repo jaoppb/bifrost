@@ -37,12 +37,12 @@ AGENTS.md section 6 describes each one.
 | `just check` | Format check, clippy, the dependency policy, the crate boundaries and the tests |
 
 `just check` must pass with zero lint exceptions before a pull request is
-opened: there are no `allow` or `expect` attributes, and a lint that does not
-fit the code means the code is redesigned.
+opened: there are no `allow` attributes (checked) and no `expect` attributes
+(review), and a lint that does not fit the code means the code is redesigned.
 
-The git hooks run the same recipes. `pre-commit` checks formatting and clippy
-when you change Rust, Markdown, TOML or lock files, `commit-msg` checks the
-commit title, and `pre-push` runs `just check`.
+The git hooks run the same recipes. `pre-commit` checks formatting when you
+change Rust or Markdown and clippy when you change Rust, TOML or lock files,
+`commit-msg` checks the commit title, and `pre-push` runs `just check`.
 
 ## Issues
 
