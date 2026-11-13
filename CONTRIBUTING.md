@@ -34,7 +34,8 @@ AGENTS.md section 6 describes each one.
 | Recipe | Runs |
 |--------|------|
 | `just fmt` | Formats Rust and Markdown in place |
-| `just check` | Format check, clippy, the dependency policy, the crate boundaries and the tests |
+| `just sync-skills` | Regenerate the `.claude/commands` mirrors after editing a skill in `.agents/skills` |
+| `just check` | Format check, clippy, the dependency policy, the crate boundaries, the skill mirrors and the tests |
 
 `just check` must pass with zero lint exceptions before a pull request is
 opened: there are no `allow` attributes (checked) and no `expect` attributes
