@@ -45,6 +45,7 @@ deny:
     cargo deny --workspace --offline check
 
 # Generate the Claude command mirrors in .claude/commands from the skills in .agents/skills (the only place a skill is edited).
+# The directory holds mirrors only: any other .md file in it is deleted.
 sync-skills:
     mkdir -p .claude/commands
     find .claude/commands -name '*.md' -delete
@@ -57,6 +58,7 @@ sync-skills:
 skills-check:
     #!/usr/bin/env bash
     set -euo pipefail
+    shopt -s nullglob
     status=0
     for dir in .agents/skills/*/; do
         name=$(basename "$dir")

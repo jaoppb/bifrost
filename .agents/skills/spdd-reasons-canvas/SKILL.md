@@ -209,7 +209,7 @@ speculative abstractions.
   the only rules
 - Shared dependency versions live in `[workspace.dependencies]`, a 0.x
   dependency that breaks between releases is pinned exactly, and `just deny`
-  (licenses, advisories, bans, sources) must pass (`AGENTS.md` section 3).;
+  (licenses, advisories, bans, sources) must pass (`AGENTS.md` section 3).
   justify each new dependency in the Approach
 - Every component has exactly one home, and the dependency graph stays acyclic
   and within the boundary rules
