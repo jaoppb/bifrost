@@ -28,10 +28,11 @@ fmt-check:
 clippy:
     cargo clippy --workspace --all-targets --all-features -- -D warnings
 
-# Run clippy, then check the dependency policy and the crate boundaries.
+# Run clippy, then check the dependency policy, the crate boundaries and the skill mirrors.
 lint: clippy
     just deny
     just arch
+    just skills-check
 
 # Check the crate boundaries: arch-lint on the sources and a guard on the Cargo graph.
 arch:
@@ -42,6 +43,38 @@ arch:
 deny:
     cargo deny fetch || echo 'warning: could not update the advisory database, using the cached copy' >&2
     cargo deny --workspace --offline check
+
+# Generate the Claude command mirrors in .claude/commands from the skills in .agents/skills (the only place a skill is edited).
+# The directory holds mirrors only: any other .md file in it is deleted.
+sync-skills:
+    mkdir -p .claude/commands
+    find .claude/commands -name '*.md' -delete
+    for dir in .agents/skills/*/; do \
+        name=$(basename "$dir"); \
+        just _skill-mirror "$name" > ".claude/commands/$name.md"; \
+    done
+
+# Fail if a mirror in .claude/commands is missing, stale or has no skill; run `just sync-skills` to fix it.
+skills-check:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    shopt -s nullglob
+    status=0
+    for dir in .agents/skills/*/; do
+        name=$(basename "$dir")
+        if ! diff -q <(just _skill-mirror "$name") ".claude/commands/$name.md" > /dev/null 2>&1; then
+            echo "stale or missing mirror: .claude/commands/$name.md" >&2
+            status=1
+        fi
+    done
+    for file in .claude/commands/*.md; do
+        [ -d ".agents/skills/$(basename "$file" .md)" ] || { echo "mirror without a skill: $file" >&2; status=1; }
+    done
+    [ "$status" -eq 0 ] || { echo "run 'just sync-skills'; skills are edited only under .agents/skills" >&2; exit 1; }
+
+# Print the command mirror of one skill: the skill with its frontmatter turned into a slash command.
+_skill-mirror name:
+    @awk -v name='{{name}}' 'NR == 1 { next } !done && /^name:/ { next } !done && /^description:/ { desc = $0; next } !done && /^---$/ { done = 1; print "---"; print "name: /" name; print "id: " name; print "category: Development"; print desc; print "---"; next } done { print }' '.agents/skills/{{name}}/SKILL.md'
 
 # Run the unit, integration and doc tests.
 test:
