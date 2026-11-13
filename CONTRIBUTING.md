@@ -40,9 +40,9 @@ AGENTS.md section 6 describes each one.
 opened: there are no `allow` or `expect` attributes, and a lint that does not
 fit the code means the code is redesigned.
 
-The git hooks run the same recipes. `pre-commit` checks formatting and clippy on
-the files you changed, `commit-msg` checks the commit title, and `pre-push` runs
-`just check`.
+The git hooks run the same recipes. `pre-commit` checks formatting and clippy
+when you change Rust, Markdown, TOML or lock files, `commit-msg` checks the
+commit title, and `pre-push` runs `just check`.
 
 ## Issues
 

@@ -11,7 +11,8 @@ Project is set up.
 
 - Section numbers are stable. New sections are appended and existing ones are
   never renumbered, because other documents and skills cite them by number.
-- Every rule is stated once, with its enforcer.
+- This file is canonical: other documents summarise a rule and link here.
+  Every rule here names its enforcer or is marked `review-only`.
 - Status values: `enforced now` (a check runs in `just check` or in a git hook
   today), `enforced by hand` (a command checks it, but it needs a login or
   network, so it is not part of `just check`) or `review-only` (no tool checks
@@ -19,7 +20,8 @@ Project is set up.
 - Never claim a check that does not run. Where an enforcer is missing, the
   status says so.
 - There are no lint exceptions: no `allow` or `expect` attributes and no
-  arch-lint suppressions anywhere. Code is redesigned to fit, or the rule is
+  arch-lint suppressions anywhere (the suppressions are review-only, section
+  3). Code is redesigned to fit, or the rule is
   changed for everyone in a pull request that says why.
 
 ## 2. Architecture
@@ -32,15 +34,15 @@ template are decided by spike #23, and #50 writes them into this section. Until
 then these are the only architecture rules.
 
 - `bifrost-core` is platform independent: it uses no platform crate (Windows,
-  macOS, Android, Wayland and D-Bus bindings) and none of the crates built on
-  it.
+  macOS, Android, Wayland and D-Bus bindings) and neither the daemon nor
+  the tools.
 - The tools check the workspace and never use the product crates.
 - A new platform crate is added to the deny list in `arch-lint.toml` in the pull
   request that introduces it.
 
 | Architecture rule | Enforcer | Status |
 |-------------------|----------|--------|
-| `bifrost-core` source uses no platform crate and no crate above it | arch-lint rule `core-stays-platform-independent`, run by `just arch` | enforced now |
+| `bifrost-core` source uses no platform crate and neither the daemon nor the tools | arch-lint rule `core-stays-platform-independent`, run by `just arch` | enforced now |
 | `bifrost-core` does not depend on those crates, directly or through another crate | `bifrost-architecture` reads the resolved Cargo graph from `cargo metadata` against the same deny list, run by `just arch` | enforced now |
 | The tools do not use `bifrost-core` or `bifrostd` | arch-lint rule `tools-do-not-use-the-product`, run by `just arch` | enforced now for source; the Cargo graph is not checked |
 | A new platform crate is added to the deny list | Code review | review-only: no tool knows which crates are platform crates |
@@ -56,7 +58,7 @@ environment builds with the same compiler. Lints are declared once in
 |----------|----------|--------|
 | Every workspace member opts in to the workspace lints | `lint-policy` test `real_workspace_opts_in`, run by `just test` | enforced now |
 | Clippy `all`, `pedantic`, `nursery` and `cargo` groups are denied, and warnings are errors | `just clippy` (`-D warnings`) | enforced now |
-| No `unwrap`, `expect`, `panic!`, `todo!`, `unimplemented!` or `unreachable!`, no indexing or string slicing, no `as` conversions, outside tests | clippy lints at `forbid` in `Cargo.toml`; tests are allowed through `clippy.toml` | enforced now |
+| No `unwrap`, `expect`, `panic!`, `todo!`, `unimplemented!` or `unreachable!`, no indexing or string slicing, no `as` conversions | clippy lints at `forbid` in `Cargo.toml`; `clippy.toml` allows only `unwrap`, `expect`, `panic`, indexing, printing and `dbg!` in tests, and the rest apply there too | enforced now |
 | `unsafe` code is forbidden | rustc lint `unsafe_code` at `forbid` | enforced now |
 | `///` docs on public items and module docs, `Debug` on public types, no needless `pub` | rustc lints `missing_docs`, `missing_debug_implementations` and `unreachable_pub` at `forbid` | enforced now |
 | No printing or `dbg!` outside tests | clippy `print_stdout`, `print_stderr` and `dbg_macro` at `forbid` | enforced now |
@@ -91,9 +93,10 @@ are in `just test`.
 
 - Every change is tied to one GitHub issue, and a branch finishes at most one.
 - **Branches** are named `<type>/<issue>`, for example `docs/13`, where `<type>`
-  is the commit type that matches the issue's `type:` label.
+  is the word of the issue's `type:` label.
 - **Commits** are conventional: `<type>: <summary> (#<issue>)`, with a
-  conventional type such as `feat`, `fix`, `chore`, `docs` or `refactor`.
+  conventional type such as `feat`, `fix`, `chore`, `docs` or `refactor`. The
+  `convco` types have no `spike`, so a `type:spike` issue commits as `docs`.
   Mention the epic only as `Refs #<n>`, and never close an epic with a commit.
 - **Pull requests** are titled like a commit and filled from
   `.github/pull_request_template.md`: `Closes #<issue>`, What, Notes and Test
@@ -120,6 +123,7 @@ are in `just test`.
 | Workflow rule | Enforcer | Status |
 |---------------|----------|--------|
 | Commit titles are conventional commits | lefthook `commit-msg` hook runs `convco`; git-generated titles (merge, revert, fixup, squash, amend) are skipped | enforced now, locally |
+| Every change is tied to one issue, and a branch finishes at most one | Code review | review-only: no check reads the issue of a change |
 | The `(#<issue>)` suffix, the branch name and `Closes #` in the pull request | Code review | review-only: no check reads them |
 | Code and Markdown are formatted and linted before a commit, and the full gate runs before a push | lefthook `pre-commit` (`just fmt-check`, `just clippy`) and `pre-push` (`just check`), installed by `just setup` | enforced now, locally; `--no-verify` skips them, and there is no CI yet |
 | Merge commits only, the pull request title and body as the merge message, the branch deleted on merge | `[github.repository.settings]` in `tools.toml`, compared by `just repo-check` | enforced by hand |
@@ -223,6 +227,6 @@ progress or In review for a new blocker.
 |---------------------|----------|--------|
 | The label list above and in CONTRIBUTING.md lists exactly the labels of `tools.toml`, and each issue form carries its label and title prefix | `just repo-check` | enforced by hand |
 | Labels, milestones and merge settings on GitHub match `tools.toml` | `just repo-check`, and `just repo-sync` to apply | enforced by hand |
-| Open issues have a milestone, one `type:` label, an `area:` label and no blocker cycle | `just issues-check` | enforced by hand |
+| Open issues have a milestone, one `type:` label, an `area:` label, a parent (epics excepted), a Project card and no blocker cycle | `just issues-check` | enforced by hand |
 | The Ready gate and the Status of each card | `just project-check` and `just project-sync` | enforced by hand |
-| Hierarchy, parent, Priority meaning, dependency links and the SPDD gate | Code review | review-only: GitHub state cannot be reached from `just check`, and no CI exists yet |
+| Hierarchy levels, Priority meaning, dependency links and the SPDD gate | Code review | review-only: GitHub state cannot be reached from `just check`, and no CI exists yet |

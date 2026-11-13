@@ -2,8 +2,8 @@
 
 This page describes how the Bifrost Project is set up and operated. The rules
 are in [AGENTS.md](../../AGENTS.md) section 7. This page repeats a rule only
-where it needs the Project's context. Current state, such as which issue has
-which priority, lives in the Project and is not copied here.
+where it needs the Project's context. Which issue has which priority lives in
+the Project and is not copied here; the two snapshots below carry their date.
 
 The GitHub API can create a Project's fields and read its views and workflows,
 but it cannot set a view's grouping, sorting or sums, and it cannot create or
@@ -23,7 +23,7 @@ repository is an item, open or closed.
 |-------|------|--------|---------|
 | Status | Single select | Backlog, Ready, In progress, In review, Done | Where the issue is in its life. The entry conditions are in AGENTS.md section 7 |
 | Priority | Single select | P0, P1, P2, P3 | Order of work inside a milestone |
-| Effort | Number | 1, 2, 3, 5, 8, 13 | Fibonacci points for the issue's own work, excluding its sub-issues. Epics have none |
+| Effort | Number | 1, 2, 3, 5, 8, 13 | Points for the issue's own work, as AGENTS.md section 7 says |
 | Milestone | Built in | `v0.1.0` to `v0.5.0` | The release |
 | Parent issue | Built in | An epic or a story | The place in the tree |
 | Sub-issues progress | Built in | Closed over total | Progress of an epic or a story |
@@ -57,15 +57,15 @@ Set these by hand, because the API cannot:
 A change to a view is a draft until you save it from the tab's menu
 (**Save changes**).
 
-Current state: the Project has only its default table view, named "View 1", with
-no filter, grouping or sorting. The views above are not created yet.
+Snapshot on 2026-11-13: the Project has only its default table view, named "View
+1", with no filter, grouping or sorting. The views above are not created yet.
 
 ## Built-in workflows
 
 The API can read which workflows are on but cannot change them, so they are
 enabled by hand on the Project's Workflows page.
 
-| Workflow | Effect | Needed | State |
+| Workflow | Effect | Needed | State on 2026-11-13 |
 |----------|--------|--------|-------|
 | Item added to project | Status becomes Backlog | Yes | Off |
 | Item closed | Status becomes Done, including an issue closed as not planned | Yes | Off |
