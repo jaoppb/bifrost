@@ -1,0 +1,32 @@
+name: "Epic"
+description: "A closeable outcome made of stories"
+title: "epic: "
+labels: ["epic"]
+body:
+  - type: markdown
+    attributes:
+      value: "After filing, set an `area:` label, the release milestone, the parent (sub-issue) and any blocked-by links in GitHub, and Priority and Effort in the Project."
+  - type: textarea
+    id: goal
+    attributes:
+      label: "Goal"
+      description: "The outcome, in one or two sentences."
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: "Context"
+      description: "Why it matters and what exists today."
+    validations:
+      required: true
+  - type: textarea
+    id: dod
+    attributes:
+      label: "Definition of Done"
+      description: "Observable, checkable outcomes."
+      value: |
+        - [ ] Every child is closed
+        - [ ] `just check` passes on main
+    validations:
+      required: true

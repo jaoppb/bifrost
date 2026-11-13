@@ -1,0 +1,44 @@
+name: "Docs"
+description: "Documentation, guides or specifications"
+title: "docs: "
+labels: ["type:docs"]
+body:
+  - type: markdown
+    attributes:
+      value: "After filing, set an `area:` label, the release milestone, the parent (sub-issue) and any blocked-by links in GitHub, and Priority and Effort in the Project."
+  - type: textarea
+    id: goal
+    attributes:
+      label: "Goal"
+      description: "What the reader should be able to do or know."
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: "Context"
+      description: "Who reads it and what is missing or wrong today."
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: "Scope"
+      description: "Which documents get written or changed."
+    validations:
+      required: true
+  - type: textarea
+    id: dod
+    attributes:
+      label: "Definition of Done"
+      description: "Observable, checkable outcomes."
+      value: |
+        - [ ] Documents written and reviewed
+        - [ ] `just check` passes
+    validations:
+      required: true
+  - type: textarea
+    id: non-goals
+    attributes:
+      label: "Non-goals"
+      description: "What this deliberately does not do."

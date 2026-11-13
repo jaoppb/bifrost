@@ -7,9 +7,17 @@
       url = "github:oxalica/rust-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Pinned to a commit, not a tag: the single `tools` binary and the [workflow] block exist only on
+    # main (the unreleased v0.3.0). Move the pin with `nix flake update tools` once v0.3.0 is tagged.
+    tools = {
+      url = "github:jaoppb/tools/69c732670a9b65831d3ea91de68e1a1b7b1f5149";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
+    };
+    flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, rust-overlay }:
+  outputs = { self, nixpkgs, rust-overlay, tools, ... }:
     let
       # nixos-unstable (26.11) dropped x86_64-darwin; Intel Macs use rustup with rust-toolchain.toml.
       forAllSystems = nixpkgs.lib.genAttrs [
@@ -55,7 +63,10 @@
               actionlint
               shellcheck
               pkg-config
-            ]) ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isLinux (with pkgs; [
+            ]) ++ [
+              # The `tools` binary (issues, repo and project checks), built from the pinned flake input.
+              tools.packages.${system}.tools
+            ] ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isLinux (with pkgs; [
               # Linux only: mold is not available on macOS, and a Nix clang
               # would shadow Apple's toolchain there. Linker wiring is #40.
               clang

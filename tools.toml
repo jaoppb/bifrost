@@ -1,0 +1,80 @@
+# Declarative repository state, audited by `jaoppb/tools` (`just repo-check`, `just issues-check`,
+# `just project-check`). GitHub is brought in line with it by `just repo-sync` and `just project-sync`.
+
+[github.repository]
+owner = "jaoppb"
+name = "bifrost"
+
+[github.repository.settings]
+allow_merge_commit = true
+allow_squash_merge = false
+allow_rebase_merge = false
+delete_branch_on_merge = true
+merge_commit_title = "PR_TITLE"
+merge_commit_message = "PR_BODY"
+
+[github.labels]
+unmanaged = "warn"
+deprecated = [
+    "bug",
+    "documentation",
+    "duplicate",
+    "enhancement",
+    "good first issue",
+    "help wanted",
+    "invalid",
+    "question",
+    "wontfix",
+    "accessibility",
+]
+items = [
+    { name = "epic", color = "b60205", description = "A closeable outcome made of stories" },
+    { name = "type:feat", color = "1d76db", description = "New behaviour or capability" },
+    { name = "type:fix", color = "d73a4a", description = "Something is broken" },
+    { name = "type:chore", color = "8b949e", description = "Tooling, CI, housekeeping, dependencies" },
+    { name = "type:docs", color = "0075ca", description = "Documentation, guides, specifications" },
+    { name = "type:refactor", color = "5319e7", description = "Restructure without changing behaviour" },
+    { name = "type:spike", color = "fbca04", description = "Time-boxed research that answers a question" },
+    { name = "area:tooling", color = "2ea44f", description = "Flake, Nix, just, hooks, linters, Cargo workspace" },
+    { name = "area:ci", color = "2ea44f", description = "GitHub Actions: checks, builds and releases" },
+    { name = "area:docs", color = "0075ca", description = "Rulebook, specification, ADRs and guides" },
+    { name = "area:core", color = "0e8a16", description = "Domain, sync engine, rules engine and daemon" },
+    { name = "area:transport", color = "0e8a16", description = "Tailscale integration, discovery, pairing and wire protocol" },
+    { name = "area:clipboard", color = "5319e7", description = "Clipboard sync and clipboard history integrations" },
+    { name = "area:notifications", color = "5319e7", description = "Notification capture, rules and mirroring" },
+    { name = "area:files", color = "5319e7", description = "File transfer between devices" },
+    { name = "area:linux", color = "c5def5", description = "Linux adapters and packaging (Hyprland first)" },
+    { name = "area:ui", color = "f143ab", description = "Settings UI, tray and command line client" },
+    { name = "area:android", color = "c5def5", description = "Android app, Kotlin shell and bindings" },
+    { name = "area:macos", color = "c5def5", description = "macOS adapters, bundle and distribution" },
+    { name = "area:windows", color = "c5def5", description = "Windows adapters, packaging and distribution" },
+]
+
+[github.milestones]
+unmanaged = "error"
+items = [
+    { title = "v0.1.0", description = "Bootstrap: dev environment, quality gates, issue workflow, CI, releases and the architecture decisions", state = "open" },
+    { title = "v0.2.0", description = "Linux on Hyprland: pairing over Tailscale, clipboard sync with Vicinae history, notification sharing and file transfer", state = "open" },
+    { title = "v0.3.0", description = "Android: app with the Rust core, clipboard, notification sharing and file transfer", state = "open" },
+    { title = "v0.4.0", description = "macOS: daemon and signed bundle, clipboard, mirrored notifications and file transfer", state = "open" },
+    { title = "v0.5.0", description = "Windows: daemon and packaging, clipboard with clipboard history, notification sharing and file transfer", state = "open" },
+]
+
+# Each form in .github/ISSUE_TEMPLATE/ must carry this label and title prefix.
+[github.issue_templates]
+require_label = true
+items = [
+    { file = "epic.yml", label = "epic", title = "epic: " },
+    { file = "feat.yml", label = "type:feat", title = "feat: " },
+    { file = "fix.yml", label = "type:fix", title = "fix: " },
+    { file = "chore.yml", label = "type:chore", title = "chore: " },
+    { file = "docs.yml", label = "type:docs", title = "docs: " },
+    { file = "refactor.yml", label = "type:refactor", title = "refactor: " },
+    { file = "spike.yml", label = "type:spike", title = "spike: " },
+]
+
+[github.project]
+number = 5
+
+[workflow]
+extends = "builtin:cosmo"

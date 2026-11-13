@@ -1,0 +1,45 @@
+name: "Feature"
+description: "New behaviour or capability"
+title: "feat: "
+labels: ["type:feat"]
+body:
+  - type: markdown
+    attributes:
+      value: "After filing, set an `area:` label, the release milestone, the parent (sub-issue) and any blocked-by links in GitHub, and Priority and Effort in the Project."
+  - type: textarea
+    id: goal
+    attributes:
+      label: "Goal"
+      description: "The behaviour the user gets."
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: "Context"
+      description: "Why it is needed and what exists today."
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: "Scope"
+      description: "What gets built, as a list."
+    validations:
+      required: true
+  - type: textarea
+    id: dod
+    attributes:
+      label: "Definition of Done"
+      description: "Observable, checkable outcomes."
+      value: |
+        - [ ] Behaviour works as described
+        - [ ] Tests cover it
+        - [ ] `just check` passes
+    validations:
+      required: true
+  - type: textarea
+    id: non-goals
+    attributes:
+      label: "Non-goals"
+      description: "What this deliberately does not do."
