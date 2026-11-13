@@ -1,9 +1,9 @@
 # Bifrost product specification
 
 This is the source for what bifrost does, for whom, on which system and what it
-deliberately does not do. The README platform table is derived from it.
-Architecture and protocol design are not here: the spikes in the
-[open questions](#open-questions) answer them.
+deliberately does not do. The README platform table is derived from it, and
+review keeps the two in sync. Architecture and protocol design are not here: the
+spikes in the [open questions](#open-questions) answer them.
 
 Nothing described here is built yet. The matrix states the **target**: what
 bifrost aims to support at each milestone. The README states the **status**.
@@ -75,6 +75,8 @@ An integration for another system is added only once its issue
 
 ## Privacy
 
+These are target rules: nothing enforces them yet.
+
 - Content that its source marks as concealed or sensitive, such as a password
   manager's copies, is never synced. There is no override in version 1.
 - What leaves a device is decided on the sending side, never by the receiver.
@@ -84,10 +86,9 @@ An integration for another system is added only once its issue
 ## Non-goals
 
 - Syncing with other people's devices: version 1 is one person and their own
-  devices. See [#57][i57].
+  devices, pending [#57][i57].
 - Any server, account or cloud relay of bifrost's own.
-- GNOME clipboard sync, macOS notification capture and Android background
-  clipboard reading, for the reasons above.
+- What the [accepted limits](#accepted-limits) rule out.
 - Architecture and protocol design, and UI design: they belong to the spikes.
 
 ## Open questions

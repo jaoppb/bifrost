@@ -19,9 +19,9 @@ each limit.
 | Platform | Clipboard | History integration | Notifications | File transfer | Milestone |
 |----------|-----------|---------------------|---------------|---------------|-----------|
 | Linux (Hyprland first) | planned (GNOME not planned) | planned (Vicinae) | planned | planned | `v0.2.0` |
-| Android | planned (limited: sends on demand) | not planned | planned | planned | `v0.3.0` |
-| macOS | planned | not planned | planned (shows only, captures none) | planned | `v0.4.0` |
-| Windows | planned | not planned | planned | planned | `v0.5.0` |
+| Android | planned (limited: sends on demand) | not planned (open) | planned | planned | `v0.3.0` |
+| macOS | planned | not planned (open) | planned (shows only, captures none) | planned | `v0.4.0` |
+| Windows | planned | not planned (open) | planned | planned | `v0.5.0` |
 
 Devices reach each other over [Tailscale](https://tailscale.com/). The
 milestones and their scope are listed in `tools.toml`.
