@@ -14,6 +14,8 @@ merge_commit_title = "PR_TITLE"
 merge_commit_message = "PR_BODY"
 
 [github.labels]
+# The docs whose `labels:start` / `labels:end` block `just repo-check` compares with `items` below.
+docs = ["AGENTS.md", "CONTRIBUTING.md"]
 unmanaged = "warn"
 deprecated = [
     "bug",
