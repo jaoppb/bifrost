@@ -50,3 +50,23 @@ test:
 
 # Run every check: format, lint and tests.
 check: fmt-check lint test
+
+# Audit open GitHub issues against the workflow rules of tools.toml.
+issues-check:
+    tools issues check
+
+# Audit the GitHub repository settings, labels and milestones against tools.toml (writes nothing).
+repo-check:
+    tools repo check
+
+# Make the GitHub repository settings, labels and milestones match tools.toml (writes to GitHub).
+repo-sync:
+    tools repo sync
+
+# Print the planned Project Status moves without writing (exits 1 when there are any).
+project-check:
+    tools project check
+
+# Write the planned Project Status moves to the GitHub Project.
+project-sync:
+    tools project sync

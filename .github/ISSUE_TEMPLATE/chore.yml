@@ -1,0 +1,44 @@
+name: "Chore"
+description: "Tooling, CI, housekeeping or dependencies"
+title: "chore: "
+labels: ["type:chore"]
+body:
+  - type: markdown
+    attributes:
+      value: "After filing, set an `area:` label, the release milestone, the parent (sub-issue) and any blocked-by links in GitHub, and Priority and Effort in the Project."
+  - type: textarea
+    id: goal
+    attributes:
+      label: "Goal"
+      description: "What gets set up, upgraded or kept in order."
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: "Context"
+      description: "Why now and what exists today."
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: "Scope"
+      description: "What gets changed, as a list."
+    validations:
+      required: true
+  - type: textarea
+    id: dod
+    attributes:
+      label: "Definition of Done"
+      description: "Observable, checkable outcomes."
+      value: |
+        - [ ] Task completed and verified
+        - [ ] `just check` passes with zero lint exceptions
+    validations:
+      required: true
+  - type: textarea
+    id: non-goals
+    attributes:
+      label: "Non-goals"
+      description: "What this deliberately does not do."

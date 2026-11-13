@@ -7,9 +7,16 @@
       url = "github:oxalica/rust-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Pinned to a release tag; move it with a new tag when upgrading `tools`.
+    tools = {
+      url = "github:jaoppb/tools/v0.3.0";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
+    };
+    flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, rust-overlay }:
+  outputs = { self, nixpkgs, rust-overlay, tools, ... }:
     let
       # nixos-unstable (26.11) dropped x86_64-darwin; Intel Macs use rustup with rust-toolchain.toml.
       forAllSystems = nixpkgs.lib.genAttrs [
@@ -55,7 +62,14 @@
               actionlint
               shellcheck
               pkg-config
-            ]) ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isLinux (with pkgs; [
+            ]) ++ [
+              # The `tools` binary (issues, repo and project checks), built from the flake input.
+              # Its changelog test shells out to git, which the upstream package does not declare as a
+              # test input, so the sandbox build fails without it (tools v0.3.0). Drop once fixed upstream.
+              (tools.packages.${system}.tools.overrideAttrs (old: {
+                nativeCheckInputs = (old.nativeCheckInputs or [ ]) ++ [ pkgs.git ];
+              }))
+            ] ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isLinux (with pkgs; [
               # Linux only: mold is not available on macOS, and a Nix clang
               # would shadow Apple's toolchain there. Linker wiring is #40.
               clang
