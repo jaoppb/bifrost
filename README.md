@@ -12,14 +12,16 @@ nothing to install or run. The first target is Linux on Hyprland (milestone
 
 ## Platforms
 
-Every cell is planned. None is built.
+Every cell is planned. None is built. The
+[product specification](docs/SPEC.md) is the source of this table and explains
+each limit.
 
-| Platform | Clipboard | Notifications | File transfer | Milestone |
-|----------|-----------|---------------|---------------|-----------|
-| Linux (Hyprland first) | planned | planned | planned | `v0.2.0` |
-| Android | planned | planned | planned | `v0.3.0` |
-| macOS | planned | planned | planned | `v0.4.0` |
-| Windows | planned | planned | planned | `v0.5.0` |
+| Platform | Clipboard | History integration | Notifications | File transfer | Milestone |
+|----------|-----------|---------------------|---------------|---------------|-----------|
+| Linux (Hyprland first) | planned (GNOME not planned) | planned (Vicinae) | planned | planned | `v0.2.0` |
+| Android | planned (limited: sends on demand) | not planned (open) | planned | planned | `v0.3.0` |
+| macOS | planned | not planned (open) | planned (shows only, captures none) | planned | `v0.4.0` |
+| Windows | planned | not planned (open) | planned | planned | `v0.5.0` |
 
 Devices reach each other over [Tailscale](https://tailscale.com/). The
 milestones and their scope are listed in `tools.toml`.
