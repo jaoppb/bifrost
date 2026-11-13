@@ -7,10 +7,9 @@
       url = "github:oxalica/rust-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # Pinned to a commit, not a tag: the single `tools` binary and the [workflow] block exist only on
-    # main (the unreleased v0.3.0). Move the pin with `nix flake update tools` once v0.3.0 is tagged.
+    # Pinned to a release tag; move it with a new tag when upgrading `tools`.
     tools = {
-      url = "github:jaoppb/tools/69c732670a9b65831d3ea91de68e1a1b7b1f5149";
+      url = "github:jaoppb/tools/v0.3.0";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
     };
@@ -64,8 +63,12 @@
               shellcheck
               pkg-config
             ]) ++ [
-              # The `tools` binary (issues, repo and project checks), built from the pinned flake input.
-              tools.packages.${system}.tools
+              # The `tools` binary (issues, repo and project checks), built from the flake input.
+              # Its changelog test shells out to git, which the upstream package does not declare as a
+              # test input, so the sandbox build fails without it (tools v0.3.0). Drop once fixed upstream.
+              (tools.packages.${system}.tools.overrideAttrs (old: {
+                nativeCheckInputs = (old.nativeCheckInputs or [ ]) ++ [ pkgs.git ];
+              }))
             ] ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isLinux (with pkgs; [
               # Linux only: mold is not available on macOS, and a Nix clang
               # would shadow Apple's toolchain there. Linker wiring is #40.
