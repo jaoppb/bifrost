@@ -16,7 +16,7 @@ Project is set up.
 - Status values: `enforced now` (a check runs in `just check` or in a git hook
   today), `enforced by hand` (a command checks it, but it needs a login or
   network, so it is not part of `just check`) or `review-only` (no tool checks
-  it, with the reason).
+  it, with the reason). A status may add `locally`: only the git hooks run it.
 - Never claim a check that does not run. Where an enforcer is missing, the
   status says so.
 - There are no lint exceptions: no `allow` or `expect` attributes and no
@@ -115,7 +115,7 @@ are in `just test`.
   5 has no SPDD artifacts, and spikes are exempt. The skills that implement
   these steps are installed by #14.
 - **Documentation** is Markdown that passes `rumdl`: prose is at most 80 columns
-  and `just fmt` wraps it. Tables, code blocks and links are not wrapped.
+  and `just fmt` wraps it. Tables and code blocks are not wrapped.
 - Documentation describes what exists. A feature that is not built is marked
   planned, and a rule is never written before its check runs or before it is
   marked `review-only`.
@@ -150,7 +150,7 @@ with `.envrc`) and fail with a clear message outside it.
 | `just deny` | Check advisories, licenses, bans and sources with `cargo deny`; the advisory database is fetched first and the cached copy is used when that fails |
 | `just test` | Run the unit, integration and doc tests |
 | `just check` | Run every check: format, lint and tests |
-| `just issues-check` | Audit the open issues against the workflow of `tools.toml` (milestones, labels, blockers); needs `gh` logged in |
+| `just issues-check` | Audit the open issues against the workflow of `tools.toml` (milestones, labels, parents, Project cards, blockers and release order); needs `gh` logged in |
 | `just repo-check` | Compare the repository settings, labels, milestones and label lists in the docs with `tools.toml`, and write nothing; needs `gh` logged in |
 | `just repo-sync` | Make the repository settings, labels and milestones match `tools.toml`; writes to GitHub |
 | `just project-check` | Print the planned Project Status moves and write nothing; exits 1 when there are any; needs the `project` scope |
@@ -227,6 +227,6 @@ progress or In review for a new blocker.
 |---------------------|----------|--------|
 | The label list above and in CONTRIBUTING.md lists exactly the labels of `tools.toml`, and each issue form carries its label and title prefix | `just repo-check` | enforced by hand |
 | Labels, milestones and merge settings on GitHub match `tools.toml` | `just repo-check`, and `just repo-sync` to apply | enforced by hand |
-| Open issues have a milestone, one `type:` label, an `area:` label, a parent (epics excepted), a Project card and no blocker cycle | `just issues-check` | enforced by hand |
+| Open issues have a milestone, one `type:` label, an `area:` label, a parent (epics excepted), a Project card and no blocker cycle; no open issue under a closed parent, and none under or blocking an issue of an earlier release | `just issues-check` | enforced by hand |
 | The Ready gate and the Status of each card | `just project-check` and `just project-sync` | enforced by hand |
-| Hierarchy levels, Priority meaning, dependency links and the SPDD gate | Code review | review-only: GitHub state cannot be reached from `just check`, and no CI exists yet |
+| Hierarchy levels, Priority meaning, Fibonacci Effort values, unestimated epics, dependency links and the SPDD gate | Code review | review-only: GitHub state cannot be reached from `just check`, and no CI exists yet |

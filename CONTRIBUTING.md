@@ -23,7 +23,7 @@ To run one recipe without entering the shell, prefix it:
 shell.
 
 `gh` is part of the dev shell. The issue and Project recipes need it logged in
-(`gh auth login`), and `just project-check` also needs the `project` scope
+(`gh auth login`), and the Project recipes also need the `project` scope
 (`gh auth refresh -s project`).
 
 ## The checks
@@ -87,7 +87,8 @@ epics carry `epic`.
 
 ## Branches and commits
 
-Name the branch `<type>/<issue>`, for example `docs/13` or `chore/12`.
+Name the branch `<type>/<issue>`, for example `docs/13` or `chore/12`. A
+`type:spike` issue uses `spike/<issue>`, and its commits use `docs`.
 
 Commit titles are conventional commits that end with the issue number:
 

@@ -19,7 +19,7 @@ The Project is [Bifrost](https://github.com/users/jaoppb/projects/5), number 5
 in `tools.toml`. It is linked to `jaoppb/bifrost`, and every issue of the
 repository is an item, open or closed.
 
-| Field | Kind | Values | Meaning |
+| Field | Kind | Values (a convention for Number) | Meaning |
 |-------|------|--------|---------|
 | Status | Single select | Backlog, Ready, In progress, In review, Done | Where the issue is in its life. The entry conditions are in AGENTS.md section 7 |
 | Priority | Single select | P0, P1, P2, P3 | Order of work inside a milestone |
