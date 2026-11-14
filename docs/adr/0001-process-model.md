@@ -87,8 +87,9 @@ on Linux. The tray for macOS and Windows is chosen when those milestones start.
 Tauri 2 is the fallback if the unverified points below fail for iced.
 
 **First Linux release.** `v0.2.0` ships the daemon and the command line client
-only. Pairing, devices, rules, file sending and status go through the command
-line and a config file, as the surfaces table in the specification says. The UI
+only. Pairing, devices, file sending and status go through the command line, and
+rules also through a config file, as the surfaces table in the specification
+says. The UI
 and the tray come in a later release, on the toolkit above.
 
 ## Consequences
@@ -170,5 +171,6 @@ limits. The decision is revisited if one of them fails for iced.
   not records.
 - The systemd user unit and the local socket were not built, and
   `interprocess` was not compiled.
-- Build times were not recorded, because the five spike builds (four toolkits
-  and `ksni`) ran at once, and the RSS is one sample taken at window start.
+- Build times were recorded but not compared, because the five spike builds
+  (four toolkits and `ksni`) ran at once, and the RSS is one sample taken at
+  window start.
