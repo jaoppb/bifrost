@@ -3,12 +3,16 @@
 For the bifrost Android app (Kotlin, decided in the Android milestone; see
 `docs/SPEC.md`). The Linux desktop UI is in [desktop.md](desktop.md).
 
-Material Design 3 governs structure, navigation, and interaction; brand
-expresses through Material's theming (color roles, type scale, shape, motion).
-On Android the app receives the clipboard automatically and sends it on demand,
-because Android does not let an app read the clipboard in the background (a
-limit accepted in `docs/SPEC.md`): make the on-demand send an obvious, one-step
-action.
+The Android toolkit is decided in the Android milestone (`v0.3.0`), and
+Material Design 3 is the working assumption until then: confirm it there and
+revise this file if the decision differs.
+
+Under that assumption, Material Design 3 governs structure, navigation, and
+interaction; brand expresses through Material's theming (color roles, type
+scale, shape, motion). On Android the app receives the clipboard automatically
+and sends it on demand, because Android does not let an app read the clipboard
+in the background (a limit accepted in `docs/SPEC.md`): make the on-demand send
+an obvious, one-step action.
 
 ## The Android slop test
 

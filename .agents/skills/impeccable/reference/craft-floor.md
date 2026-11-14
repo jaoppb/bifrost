@@ -1,8 +1,8 @@
 # Craft floor
 
 Read this immediately before any UI edit, including small refinements, and build
-without announcing the checklist. `PRODUCT.md` and a pinned brief override
-anything here except a line marked as a ban.
+without announcing the checklist. `PRODUCT.md` and the brief the person gave
+override anything here except a line marked as a ban.
 
 ## Verify
 

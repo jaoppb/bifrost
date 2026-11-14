@@ -2,7 +2,7 @@
 
 `init` captures durable product truth in `PRODUCT.md` at the repository root. It
 does not invent a visual world and does not write `DESIGN.md`: bifrost has no UI
-to document yet, so visual design is a non-goal until the UI exists.
+to document yet, and visual design is not decided yet.
 
 ## Step 1: Load current state
 

@@ -44,8 +44,8 @@ Run only for material unresolved decisions:
   delivery constraints are binding?
 
 Never ask for visual values or canned aesthetic lanes. Bifrost has no visual
-design yet (`DESIGN.md` is a non-goal), so a brief states what the screen does
-and for whom, and leaves the look to the platform's conventions
+design yet (`DESIGN.md` is not decided yet), so a brief states what the screen
+does and for whom, and leaves the look to the platform's conventions
 ([desktop.md](desktop.md), [android.md](android.md)).
 
 ## Phase 2: Resolve the interaction

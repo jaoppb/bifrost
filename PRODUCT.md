@@ -11,7 +11,8 @@ something planned or open, it stays marked that way here.
 
 - **Linux desktop**, on Hyprland first: the settings and pairing UI in iced and
   the tray through `ksni` (StatusNotifierItem), decided in ADR 0001.
-- **Android**: a native Kotlin app, decided in the Android milestone (`v0.3.0`).
+- **Android**: a Kotlin app, decided in the Android milestone (`v0.3.0`);
+  Material 3 is the working assumption until then.
 - macOS and Windows UIs are decided when those milestones start (`v0.4.0` and
   `v0.5.0`).
 
@@ -40,8 +41,9 @@ be pasted on the others, and the person rarely needs to look at bifrost.
 
 The UI is a thin client of `bifrostd` over a local socket and holds no state of
 its own. The first Linux release (`v0.2.0`) ships the daemon and the command
-line client only. The UI and the tray come in a later release, with the
-pairing, devices and tray status surfaces first.
+line client only. The UI and the tray come in a later release. The product
+owner puts pairing, devices and tray status first (decided in the `#16`
+interview, not yet in the specification).
 
 | Surface | What the person does there | Command line (`v0.2.0`) | UI and tray |
 |---------|----------------------------|-------------------------|-------------|
@@ -98,6 +100,7 @@ feature that is not built.
   desktop UI (ADR 0001 records this cost, and none was tried). Keyboard access,
   visible focus, contrast in light and dark, and the system text size are
   required, and every action stays available in the command line client.
-- Android follows Material 3 accessibility: named controls, 48 dp touch targets,
-  scalable text and the system Back gesture.
+- Android accessibility (named controls, 48 dp touch targets, scalable text and
+  the system Back gesture) follows Material 3 as a working assumption, to be
+  confirmed in the `v0.3.0` milestone.
 - Status is never color only.

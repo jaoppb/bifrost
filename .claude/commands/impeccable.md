@@ -8,9 +8,9 @@ description: "Use for any UI work in Bifrost: shape a screen, polish, audit, lay
 # Impeccable for Bifrost
 
 Design guidance for Bifrost's UI, adapted from `pbakaus/impeccable` (see
-`NOTICE.md`). Bifrost's UI is small: a settings and pairing UI and a
-tray on the Linux desktop (iced and `ksni`, decided in ADR 0001), and a native
-Android app in Kotlin. There is no web app, so this skill has no browser tooling
+`NOTICE.md`). Bifrost's UI is small: a settings and pairing UI and a tray on
+the Linux desktop (iced and `ksni`, decided in ADR 0001), and an Android app in
+Kotlin. There is no web app, so this skill has no browser tooling
 and no engine binary.
 
 Core principles:
@@ -43,15 +43,15 @@ Core principles:
 
 ## How to design
 
-- **The brief wins.** Honor what `PRODUCT.md` and the person pinned. Redirecting
-  a clear brief toward your taste is failure.
+- **The brief wins.** Honor `PRODUCT.md` and the brief the person gave.
+  Redirecting a clear brief toward your taste is failure.
 - **Refinement preserves; redesign replaces.** Refinement keeps the incumbent
   look, behavior and copy, and everything outside scope. Ask before replacing
   factual copy or adding claims.
 - **Thin clients.** The UI holds no state of its own: the daemon applies every
   change, and the command line client reaches the same actions. A screen shows
   what the daemon reports, including the daemon being unreachable.
-- **No visual system yet.** `DESIGN.md` is a non-goal until a UI exists. Follow
+- **No visual system yet.** `DESIGN.md` is not decided yet. Follow
   the platform's conventions (Material 3 on Android, the iced theme and system
   preferences on the desktop) instead of inventing a visual world.
 - **Never claim an unbuilt feature.** `docs/SPEC.md` marks what is planned; UI

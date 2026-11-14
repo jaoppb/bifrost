@@ -39,7 +39,7 @@ otherwise run them yourself in this order.
      strategy, and variable-font settings avoid invisible text and disruptive
      reflow?
 2. **Source scan:** read the font, size and weight values in the target files
-   (iced `Font` and text sizes, Compose `TextStyle`) and check them against the
+   (iced `Font` and text sizes, Android text styles) and check them against the
    roles you named. Look for sizes and weights that bypass the shared values. A
    clean scan is a floor, not proof of good typography.
 

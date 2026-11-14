@@ -43,14 +43,16 @@ needs the window to be open.
 
 ## Typography
 
-- **Use the system font and size.** Follow the user's font setting rather than
+- **Aim for the system font and size.** iced draws its own widgets, so the UI
+  must implement and verify that it follows the user's font setting rather than
   bundling a face.
-- Text scales with the output scale (the Hyprland setup runs fractional scales
-  such as 1.2 and 1.5), so check sharpness and clipping at those.
+- Text scales with the output scale. The ADR 0001 spikes ran at 1.2 and 1.5, so
+  check sharpness and clipping at fractional scales.
 
 ## Color & theming
 
-- **Follow the system light or dark preference** and test both. Dark is not an
+- **The UI must follow the system light or dark preference** (iced does not do
+  it for you; implement and verify it) and test both. Dark is not an
   inverted light theme.
 - Semantic roles for surface, text, accent, border and the status colors; no raw
   hex in widgets.
@@ -59,8 +61,9 @@ needs the window to be open.
 
 - The tray speaks StatusNotifierItem, which Hyprland bars read; Hyprland itself
   has no tray.
-- The menu carries the daemon's status, pause or resume, Show settings and Quit.
-  Each entry works with no window open.
+- The menu carries Show settings and Quit, which ADR 0001 exercised over D-Bus,
+  and the daemon's status and pause, which the specification plans for the tray.
+  No entry depends on the window already being open.
 - Status is never color only: pair the icon state with text in the menu.
 
 ## Accessibility

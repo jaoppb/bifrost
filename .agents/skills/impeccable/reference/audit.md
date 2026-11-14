@@ -5,7 +5,7 @@ UI and tray, or the Android app) and generate a report. Don't fix issues;
 document them for other commands to address.
 
 This is a code-level audit, not a design critique. Audit from source (iced and
-`ksni` on the desktop, Kotlin and Compose on Android) and from captures of the
+`ksni` on the desktop, Kotlin on Android) and from captures of the
 running UI. Score against the platform reference: [desktop.md](desktop.md) or
 [android.md](android.md), both when the target spans them. Read them before
 scoring.
@@ -44,8 +44,8 @@ Run checks across 5 dimensions. Score each 0-4 using the criteria below.
 - **Main-thread work**: synchronous calls to the daemon or the disk in the draw
   or input path; dropped frames
 - **Unvirtualized lists**: long lists of devices or rules with no lazy layout
-- **Wasted rendering**: needless redraws (iced `view`) or recompositions
-  (Compose); missing keys
+- **Wasted rendering**: needless redraws (iced `view`) or redraws
+  (Android); missing keys
 - **Weight**: unused dependencies and bundled assets
 
 **Score 0-4**: 0=Janky everywhere, 1=Major problems, 2=Partial, 3=Good,
@@ -153,7 +153,7 @@ For each issue, document:
 - **Guideline**: The Material or platform rule it violates (if applicable)
 - **Recommendation**: How to fix it
 - **Suggested command**: One of `/impeccable` clarify, colorize, distill,
-  layout, onboard, polish, quieter, shape, typeset
+  layout, polish, quieter, shape, typeset
 
 ### Patterns & Systemic Issues
 
