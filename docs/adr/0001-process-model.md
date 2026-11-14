@@ -67,7 +67,7 @@ Two checks decided more than the numbers:
 - **The dependency policy.** `cargo deny check licenses` with the repository
   `deny.toml` rejected these licenses in the spikes: BSL-1.0 (two crates,
   `clipboard-win` and `error-code`, reached through iced, egui and Slint on
-  Windows only), Unlicense (`ksni` itself, and a Slint crate), CC0-1.0 (iced),
+  Windows only), Unlicense (`ksni`, which Slint pulls in too), CC0-1.0 (iced),
   OFL-1.1 and Ubuntu-font-1.0 (egui's bundled fonts, at 0.33.3 and 0.37.0),
   MPL-2.0 (seven crates in Tauri) and, for Slint, a choice of GPL-3.0-only, the
   Slint royalty-free license or a commercial one. The policy allows permissive
@@ -127,10 +127,13 @@ says. The UI and the tray come in a later release, on the toolkit above.
 - Pairing by code or QR has to work as a command line flow in `v0.2.0`, which
   the protocol spikes ([#21](https://github.com/jaoppb/bifrost/issues/21)) must
   allow.
-- The UI is written in Rust and passes the workspace lints, so there is one
+- The UI is written in Rust and can pass the workspace lints (a one-window iced
+  spike did), so there is one
   language, one toolchain and one `just check` for the product. The price is a
   tray crate of its own and a UI that draws its own widgets instead of using the
   system's.
+- iced has no accessibility library, so a screen reader may not work with the
+  UI, and none was tried with either toolkit. egui would not have this cost.
 - Android is outside this decision: its UI is Kotlin, in the Android milestone.
 - Dependency exceptions the iced route will need: BSL-1.0, CC0-1.0, Unlicense
   (`ksni`) and the licenses of the fonts it bundles, which were not checked,
@@ -144,23 +147,25 @@ says. The UI and the tray come in a later release, on the toolkit above.
   need a second path into the engine anyway.
 - **Slint.** Its generated code cannot compile under `forbid(unsafe_code)` and
   `forbid(missing_docs)`, and the repository allows no exception. It is also the
-  largest of the four (561 crates, 27 MB), and its license has to be chosen
+  the one with the most crates (561), and its license has to be chosen
   among GPL-3.0, a royalty-free license with attribution, and a paid one.
 - **Tauri 2.** It compiled under the lint policy, has the smallest binary, a
   built-in tray and a native Wayland window. It is rejected as the default for
   the cost of its web stack: a second language and a frontend toolchain beside
   `just` and the Nix shell, WebKitGTK as a runtime dependency on Linux (139 MB
-  resident at start, against 76 MB for the bare iced spike and 86 MB for iced
-  with the tray and a text field), seven MPL-2.0 crates, and a
-  frontend that cannot be checked by clippy. It remains the fallback.
+  resident at start for the main process, against 76 MB for the bare iced spike;
+  the two spikes differ in content, so this is soft evidence), seven MPL-2.0
+  crates, and a frontend that cannot be checked by clippy. It remains the
+  fallback.
 - **egui.** At 0.37.0 it compiled under the lints, rendered sharply, took
   keyboard input and clipboard, and has AccessKit, which the iced spike's
   dependency tree did not. It is rejected as the tray host on one negative
   result: hiding with `ViewportCommand::Visible(false)` left the window mapped,
   and no way to reopen a closed window was found. Other ways were not tried (see
   Unverified). A tray that shows and hides the settings window would otherwise
-  need a tray process of its own that starts the UI on demand. It also bundles
-  fonts under OFL-1.1 and Ubuntu-font-1.0. The two toolkits are otherwise close,
+  need a tray process of its own that starts the UI on demand. Its bundled fonts
+  need OFL-1.1 and Ubuntu-font-1.0 exceptions, while the fonts of iced were not
+  checked, so that point is asymmetric. The two toolkits are otherwise close,
   and egui is the choice to revisit if iced's missing accessibility matters more
   than hosting the tray in the UI process, or if a separate tray process is
   accepted.
@@ -180,10 +185,10 @@ iced.
   repeat and not records: the second-round figures (RSS of 73 MB and 0.4 s to
   map for egui 0.37, 86 and 78 MB for iced open and closed, the tray calls, hide
   and show, and the captures, which later ones overwrote); the socket mode
-  `rwxr-xr-x` in a `rwx------` directory; the `cargo deny` license results for
-  every toolkit; the clippy results for egui 0.37 and iced; and the egui 0.33.3
-  figures, whose lock file was overwritten at 0.37. The typing and paste
-  results are kept in the spikes' stdout logs.
+  `rwxr-xr-x` in a `rwx------` directory; the transient systemd unit run; the
+  `cargo deny` license results for every toolkit; the clippy results for egui
+  0.37 and iced; and the egui 0.33.3 figures, whose lock file was overwritten at
+  0.37. The typing and paste results are kept in the spikes' stdout logs.
 - Other ways to hide an egui window on Wayland (minimising, several viewports,
   calling `run_native` again) were not tried, so "egui cannot host the tray" is
   true of the tested approach only.
