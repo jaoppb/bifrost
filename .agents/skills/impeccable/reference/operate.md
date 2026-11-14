@@ -19,7 +19,7 @@ invented affordances for standard tasks. The bar is earned familiarity.
 
 - One family is often right. A well-tuned sans carries headings, buttons,
   labels, body and data.
-- Fixed scale, not fluid. Use a tight ratio (1.125 to 1.2 between steps);
+- Fixed scale. Use a tight ratio (1.125 to 1.2 between steps);
   exaggerated contrast creates noise.
 - Prose keeps a comfortable measure. Data and compact UI can run denser.
 
@@ -41,7 +41,8 @@ Restrained is the floor.
 ## Components
 
 Every interactive component has default, hover (desktop), focus, pressed,
-disabled, loading and error states. Do not ship half of them.
+disabled, loading and error states, and a screen that depends on the daemon also
+has a daemon-unreachable and an out-of-sync state. Do not ship half of them.
 
 - Skeleton states for loading, not a spinner in the middle of content.
 - Empty states that teach the interface, not "nothing here". Bifrost's first
@@ -55,7 +56,7 @@ disabled, loading and error states. Do not ship half of them.
 - Motion conveys state: change, feedback, loading, reveal. Nothing else.
 - Nothing animates on load.
 
-## Product constraints
+## Avoid
 
 - Decorative motion that does not convey state.
 - Inconsistent component vocabulary across screens. If "Save" looks different in

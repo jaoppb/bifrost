@@ -11,8 +11,8 @@ something planned or open, it stays marked that way here.
 
 - **Linux desktop**, on Hyprland first: the settings and pairing UI in iced and
   the tray through `ksni` (StatusNotifierItem), decided in ADR 0001.
-- **Android**: a Kotlin app, decided in the Android milestone (`v0.3.0`);
-  Material 3 is the working assumption until then.
+- **Android**: a Kotlin app per the specification, confirmed in the Android
+  milestone (`v0.3.0`); Material 3 is the working assumption until then.
 - macOS and Windows UIs are decided when those milestones start (`v0.4.0` and
   `v0.5.0`).
 
@@ -59,10 +59,10 @@ the same surfaces decided in its milestone.
 ## Voice
 
 Plain and calm. Short sentences, controls named by their action, and errors that
-name the problem and the next step. The words are the specification's: say
-"device", not "peer" or "node", and keep Tailscale internals out of screens
-unless they explain a failure. No jargon, no marketing tone, no promise of a
-feature that is not built.
+name the problem and the next step. The specification says "device". The product
+owner's interview adds: not "peer" or "node", and Tailscale internals stay out
+of screens unless they explain a failure. No jargon, no marketing tone, no
+promise of a feature that is not built.
 
 ## Constraints
 
@@ -75,7 +75,8 @@ feature that is not built.
 - Android sends its clipboard on demand, because it cannot read it in the
   background. The on-demand send is an obvious one-step action.
 - macOS shows mirrored notifications and sends none.
-- Pairing by code or QR works as a command line flow first.
+- Pairing by code or QR has to work as a command line flow in `v0.2.0` (ADR
+  0001); not built.
 - Open: discovery ([#22](https://github.com/jaoppb/bifrost/issues/22)), pairing
   and trust ([#21](https://github.com/jaoppb/bifrost/issues/21)) and the crate
   layout ([#23](https://github.com/jaoppb/bifrost/issues/23)). Screens that
@@ -84,6 +85,9 @@ feature that is not built.
   platform's conventions until one exists.
 
 ## Product Principles
+
+Derived from the product owner's interview answers (the primary user pairs once
+and forgets bifrost), not from the specification.
 
 - **It disappears.** The best state is that the person forgets bifrost; a screen
   earns its place by a task the command line does worse.

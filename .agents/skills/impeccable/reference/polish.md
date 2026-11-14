@@ -55,8 +55,9 @@ Do not perfect one corner while leaving the rest below the same quality bar.
 
 ### Flow and hierarchy
 
-- Match neighboring mental models, terminology, disclosure, routing, save
-  behavior, and optimistic or pessimistic patterns.
+- Match neighboring mental models, terminology, disclosure, routing, and save
+  behavior. Show the state the daemon reports; never apply a change
+  optimistically before the daemon confirms it.
 - Make the primary task and current state obvious without flattening every
   element to equal weight.
 - Ensure arrival, transition, empty, and recovery paths connect instead of
@@ -67,8 +68,8 @@ Do not perfect one corner while leaving the rest below the same quality bar.
 - Align to the project's grid and spacing scale; fix optical as well as
   mathematical alignment.
 - Group related content tightly and separate distinct groups generously.
-- Keep same-role typography consistent; test measure, wrapping, localization
-  expansion, zoom, and font loading.
+- Keep same-role typography consistent; test wrapping, text scaling, and long
+  device names.
 - Verify every supported window size and screen class rather than correcting
   only the current screenshot.
 
@@ -77,7 +78,7 @@ Do not perfect one corner while leaving the rest below the same quality bar.
 - Use semantic tokens and stable color meanings across themes.
 - Verify text, control, and focus contrast in every state.
 - Keep icon families, stroke/weight, sizing, and optical alignment coherent.
-- Prevent layout shift; use correct aspect ratios and
+- Prevent layout shift when content loads, and give icon-only controls
   accessible names.
 
 ### Interaction and state
@@ -111,7 +112,8 @@ Check:
   tablet size classes in both supported orientations on Android;
 - loading, empty, error, success, disabled, long-content, and missing-content
   states;
-- zoom, contrast, focus, semantics, and screen-reader names;
+- text scaling, contrast, focus, and (on Android) semantics and screen-reader
+  names;
 - runtime warnings, interaction latency, and dropped frames; supported OS
   versions on Android and supported compositors on the desktop;
 - agreement with `PRODUCT.md`, neighboring features, and the user's scope.

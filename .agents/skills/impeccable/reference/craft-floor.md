@@ -15,11 +15,12 @@ together in each batched look at the render.
 - **Spacing:** tight groups, generous separation, more space above a heading
   than below it. Spacing comes from shared values, not per-widget numbers.
 - **Type:** roles from the platform's scale, with obvious size and weight steps.
-  Run the real copy, including long device names and translated labels, and fix
-  what clips or overflows.
+  Run the real copy, including long device names (and translated labels, if the
+  UI is localized), and fix what clips or overflows.
 - **Motion:** only to convey state. Honor the system's reduce-motion setting.
 - **States:** default, hover (desktop), focus, pressed, disabled, loading,
-  error, empty. Plus real content and working controls.
+  error, empty, and daemon unreachable or out of sync. Plus real content and
+  working controls.
 - **Input:** every action is reachable by keyboard on the desktop and by touch
   and the system Back gesture on Android. Focus is always visible.
 - **Copy:** the product's own language. Controls name their action; errors name

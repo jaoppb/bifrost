@@ -18,6 +18,8 @@ Run checks across 5 dimensions. Score each 0-4 using the criteria below.
 
 **Check for**:
 
+- **Daemon unreachable**: a blank, stale or frozen screen when the daemon is
+  unreachable or out of sync, instead of a visible state
 - **Missing names**: interactive elements without accessible names, roles or
   state (Android: TalkBack semantics). On the desktop, iced has no
   accessibility library (ADR 0001), so do not score a screen reader: report the
@@ -44,8 +46,7 @@ Run checks across 5 dimensions. Score each 0-4 using the criteria below.
 - **Main-thread work**: synchronous calls to the daemon or the disk in the draw
   or input path; dropped frames
 - **Unvirtualized lists**: long lists of devices or rules with no lazy layout
-- **Wasted rendering**: needless redraws (iced `view`) or redraws
-  (Android); missing keys
+- **Wasted rendering**: needless redraws of the iced `view` or of Android views
 - **Weight**: unused dependencies and bundled assets
 
 **Score 0-4**: 0=Janky everywhere, 1=Major problems, 2=Partial, 3=Good,
@@ -55,8 +56,9 @@ Run checks across 5 dimensions. Score each 0-4 using the criteria below.
 
 **Check for**:
 
-- **Hard-coded colors**: raw hex instead of theme roles (Material color roles on
-  Android, the iced theme palette on the desktop)
+- **Hard-coded colors**: raw hex instead of theme roles (theme roles: Material
+  color roles on Android (a working assumption until `v0.3.0`) and the iced
+  theme palette on the desktop)
 - **Broken dark theme**: missing variants, poor contrast, a quick invert
 - **Ignored system preference**: the theme does not follow the system light or
   dark setting
@@ -150,7 +152,8 @@ For each issue, document:
 - **Location**: Screen, file, line
 - **Category**: Accessibility / Performance / Theming / Conformance / Adaptivity
 - **Impact**: How it affects users
-- **Guideline**: The Material or platform rule it violates (if applicable)
+- **Guideline**: The platform rule it violates (Material is a working assumption
+  on Android) (if applicable)
 - **Recommendation**: How to fix it
 - **Suggested command**: One of `/impeccable` clarify, colorize, distill,
   layout, polish, quieter, shape, typeset

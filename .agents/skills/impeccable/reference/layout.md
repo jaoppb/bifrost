@@ -71,10 +71,8 @@ spacing and container roles semantically.
   isolated component.
 - Make responsive behavior structural: reorder, collapse, reflow, or reveal
   based on what remains important.
-- Prefer container-aware components when the same component appears in different
-  contexts.
-- Use `gap` for sibling rhythm when it expresses the relationship more directly
-  than child margins.
+- Use the toolkit's spacing between siblings for rhythm when it expresses the
+  relationship more directly than per-child padding.
 - Keep touch targets usable even when their visible marks are small.
 - Use depth only when it clarifies state or hierarchy.
 - Make optical corrections only after inspecting the rendered result.

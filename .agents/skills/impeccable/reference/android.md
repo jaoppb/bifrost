@@ -1,7 +1,7 @@
 # Android platform
 
-For the bifrost Android app (Kotlin, decided in the Android milestone; see
-`docs/SPEC.md`). The Linux desktop UI is in [desktop.md](desktop.md).
+For the bifrost Android app (Kotlin per `docs/SPEC.md`, confirmed in the
+`v0.3.0` milestone). The Linux desktop UI is in [desktop.md](desktop.md).
 
 The Android toolkit is decided in the Android milestone (`v0.3.0`), and
 Material Design 3 is the working assumption until then: confirm it there and

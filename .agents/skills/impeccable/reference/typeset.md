@@ -30,14 +30,13 @@ otherwise run them yourself in this order.
    - **Scale and consistency:** Is there a deliberate role scale, or a
      collection of arbitrary values? Do repeated roles stay identical across
      screens and states?
-   - **Reading:** Does body copy stay within a comfortable 45–75 character
+   - **Reading:** Does body copy stay within a comfortable measure for prose
      measure? Are line height, paragraph rhythm, contrast, and tracking tuned to
      the actual face, width, language, and surface?
    - **Stress:** What happens with long headings, localization expansion, zoom,
      narrow containers, missing weights, and font fallback?
-   - **Delivery:** Are only used assets loaded? Do fallback metrics, loading
-     strategy, and variable-font settings avoid invisible text and disruptive
-     reflow?
+   - **Delivery:** Does the UI use the platform's system font? Bundling a face
+     needs a `deny.toml` exception and an ADR note (ADR 0001).
 2. **Source scan:** read the font, size and weight values in the target files
    (iced `Font` and text sizes, Android text styles) and check them against the
    roles you named. Look for sizes and weights that bypass the shared values. A
@@ -63,7 +62,7 @@ all the work. Role names and tokens should describe purpose rather than values.
   size as the floor (Material's Body Medium on Android, the desktop toolkit's
   default text size on the desktop) unless a dense role, platform convention, or
   user setting justifies otherwise.
-- Keep prose in the 45–75ch range. Tune line height inversely with measure:
+- Keep prose to a comfortable measure. Tune line height inversely with measure:
   wider lines generally need more leading.
 - Compensate light text on dark surfaces on all three perceptual axes: slightly
   more line height, a touch more tracking, and one step more weight when the
@@ -72,7 +71,8 @@ all the work. Role names and tokens should describe purpose rather than values.
   ratio.
 - Keep repeated roles consistent across screens and states.
 - Use numeric, tabular, code, and label features when their content benefits.
-- Bundle only used font assets and weights, and keep a system fallback.
+- Use the platform's system font. Bundling a face needs a `deny.toml` exception
+  and an ADR note (ADR 0001).
 - Keep dense product surfaces spatially predictable.
 - Preserve user font settings and platform text scaling.
 - Use paragraph spacing or first-line indentation as the primary paragraph
@@ -95,7 +95,7 @@ second family without a clear role it alone can perform.
   the copy.
 - Long text remains comfortable across relevant widths and languages.
 - The typography belongs to the product and its established look.
-- Loading does not create disruptive reflow or invisible text.
+- Any bundled font assets are licensed and declared.
 - Text scaling, focus, contrast, and narrow windows remain usable.
 - The final source scan has no unexplained findings.
 

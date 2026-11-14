@@ -124,7 +124,7 @@ are in `just test`.
   [PRODUCT.md](PRODUCT.md), the product record of users, devices, surfaces and
   voice. The skill is adapted to bifrost's UI (iced and `ksni` on the desktop,
   Kotlin on Android) and is edited only under `.agents/skills`. There is no
-  `DESIGN.md` until a UI exists.
+  `DESIGN.md`: visual design is not decided.
 - **Documentation** is Markdown that passes `rumdl`: prose is at most 80 columns
   and `just fmt` wraps it. Tables and code blocks are not wrapped.
 - Documentation describes what exists. A feature that is not built is marked

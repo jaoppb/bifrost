@@ -76,9 +76,8 @@ Systematically remove complexity across these dimensions:
 
 - **Linear flow**: Replace complex grids with simple vertical flow where
   possible
-- **Remove sidebars**: Move secondary content inline or hide it
-- **Full-width**: Use available space generously instead of complex multi-column
-  layouts
+- **Collapse sidebars at narrow widths**: Move secondary content inline or hide
+  it
 - **Consistent alignment**: Pick left or center, stick with it
 - **Generous white space**: Let content breathe, don't pack everything tight
 
@@ -112,7 +111,8 @@ Systematically remove complexity across these dimensions:
 **Avoid**:
 
 - Remove necessary functionality (simplicity ≠ feature-less)
-- Sacrifice accessibility for simplicity (clear labels and ARIA still required)
+- Sacrifice accessibility for simplicity (clear labels and accessible names
+  still required)
 - Make things so simple they're unclear (mystery ≠ minimalism)
 - Remove information users need to make decisions
 - Eliminate hierarchy completely (some things should stand out)
@@ -126,7 +126,7 @@ Ensure simplification improves usability:
 - **Reduced cognitive load**: Is it easier to understand what to do?
 - **Still complete**: Are all necessary features still accessible?
 - **Clearer hierarchy**: Is it obvious what matters most?
-- **Better performance**: Does simpler design load faster?
+- **Better performance**: Does the simpler design start and redraw faster?
 
 ## Document Removed Complexity
 

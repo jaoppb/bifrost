@@ -51,9 +51,10 @@ Core principles:
 - **Thin clients.** The UI holds no state of its own: the daemon applies every
   change, and the command line client reaches the same actions. A screen shows
   what the daemon reports, including the daemon being unreachable.
-- **No visual system yet.** `DESIGN.md` is not decided yet. Follow
-  the platform's conventions (Material 3 on Android, the iced theme and system
-  preferences on the desktop) instead of inventing a visual world.
+- **No visual system yet.** `DESIGN.md` is not decided yet. Follow the
+  platform's conventions (Material 3 on Android as a working assumption until
+  `v0.3.0`, the iced theme and system preferences on the desktop) instead of
+  inventing a visual world.
 - **Never claim an unbuilt feature.** `docs/SPEC.md` marks what is planned; UI
   copy and mockups follow it.
 

@@ -46,8 +46,8 @@ needs the window to be open.
 - **Aim for the system font and size.** iced draws its own widgets, so the UI
   must implement and verify that it follows the user's font setting rather than
   bundling a face.
-- Text scales with the output scale. The ADR 0001 spikes ran at 1.2 and 1.5, so
-  check sharpness and clipping at fractional scales.
+- Text scales with the output scale. The ADR 0001 spikes captured sharpness at
+  scale 1.2 only (1.5 was not captured), so check fractional scales yourself.
 
 ## Color & theming
 

@@ -84,10 +84,10 @@ when it changes what the user should do. Routine success should be brief.
 ### Help and instructional text
 
 Helper text answers an implicit question instead of restating the control. Use
-progressive disclosure for uncommon detail. Link text must make sense out of
+progressive disclosure for uncommon detail. Action labels must make sense out of
 context; icon-only controls need accessible names.
 
-## Voice, accessibility, and localization
+## Voice, accessibility, and localization (if localized)
 
 Voice stays consistent; tone adapts to the moment. Use plain language without
 flattening terminology the audience genuinely knows.
@@ -95,8 +95,9 @@ flattening terminology the audience genuinely knows.
 - Write complete translatable messages rather than concatenated fragments.
 - Keep variables and numbers structured so translators can reorder them.
 - Allow expansion instead of abbreviating prematurely.
-- Make alt text convey the image's information; use empty alt for decoration.
-- Keep screen-reader names aligned with visible labels and outcomes.
+- Give an image or icon an accessible name that conveys its information; mark
+  decoration as such.
+- On Android, keep screen-reader names aligned with visible labels and outcomes.
 - Do not rely on punctuation, color, or iconography to carry the message alone.
 
 Maintain a short terminology glossary when inconsistency spans the product. Do
@@ -109,7 +110,7 @@ Read the flow in context and test:
 - comprehension without hidden product knowledge;
 - actionability at errors, empty states, and decision points;
 - factual accuracy and consistent terminology;
-- scanability at target widths and 200% zoom;
+- scanability at target window widths and large text sizes;
 - long names, localization expansion, pluralization, and dynamic values;
 - accessible names and announced state changes;
 - tone appropriate to consequence and emotional context.
