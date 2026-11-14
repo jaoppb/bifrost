@@ -19,8 +19,8 @@ an obvious, one-step action.
 Would a fluent Android user trust this app, or trip on off-spec components? The
 most common tell is an iOS app wearing Android's skin: a bottom-only navigation
 copied from iPhone, a back arrow that ignores the system Back gesture, and
-iOS-shaped switches and dialogs. Material 3 is the rulebook; follow its
-components and theme the brand through it.
+iOS-shaped switches and dialogs. Under that assumption Material 3 is the
+rulebook; follow its components and theme the brand through it.
 
 ## Layout & structure
 
@@ -79,8 +79,7 @@ components and theme the brand through it.
   window.** Build and install, then capture with
   `adb exec-out screencap -p > <path>` (pick a device with `adb -s <serial>`
   when several are attached). Capture every device class the app ships to, at
-  least one phone and, when tablets are a target, one tablet, and write the
-  files where the review flow expects them.
+  least one phone and, when tablets are a target, one tablet.
 - **Dark theme and font scale belong in the pass.**
   `adb shell cmd uimode night yes` flips the theme;
   `adb shell settings put system font_scale 1.3` (read both settings first with

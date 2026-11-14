@@ -44,7 +44,8 @@ Every interactive component has default, hover (desktop), focus, pressed,
 disabled, loading and error states, and a screen that depends on the daemon also
 has a daemon-unreachable and an out-of-sync state. Do not ship half of them.
 
-- Skeleton states for loading, not a spinner in the middle of content.
+- A loading state, when the daemon is slow to answer, that does not shift the
+  layout.
 - Empty states that teach the interface, not "nothing here". Bifrost's first
   empty state is "no paired device yet": point to the pairing action.
 - Consistent affordances: the same button shape, form-control vocabulary and
