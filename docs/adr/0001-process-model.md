@@ -42,16 +42,17 @@ at scale 1.2, with iced 0.14.0 and egui 0.37.0:
 
 | Check | iced | egui |
 |-------|------|------|
-| Window sharp at the output's physical resolution (a `grim` capture of 940 by 360 pixels for a 784 by 300 logical area) | yes | yes |
+| Window sharp at the output's physical resolution (a `grim` capture 940 pixels wide for a window 784 logical pixels wide) | yes | yes |
 | Application id read by Hyprland window rules (`class` in `hyprctl clients`) | set through `platform_specific.application_id` | set through `with_app_id` |
 | Typing, paste with non-ASCII text and copy, through `ydotool` and `wl-copy` | works | works |
-| Tray activation and menu entries, called over D-Bus as a bar does | `Activate` shows the window, `Event` runs Show and Quit | `Activate` runs the handler |
-| Hide the window to the tray and show it again | works in `iced::daemon` mode: the window is closed and reopened, the process stays up (86 MB open, 78 MB closed) | does not work: `ViewportCommand::Visible(false)` leaves the window mapped, and `eframe` has no way to reopen a closed window in the same process |
+| Tray calls over D-Bus, as a bar makes them | `Activate` shows the window, and the menu `Event` runs Show and Quit | `Activate` runs the handler; the menu was not called |
+| Hide the window to the tray and show it again | works in `iced::daemon` mode: the window is closed and reopened, the process stays up (86 MB open, 78 MB closed) | not working with `ViewportCommand::Visible(false)`, which leaves the window mapped; closing and reopening a window in one process was not found in `eframe` |
 | Accessibility | no AccessKit in the dependency tree | AccessKit and `accesskit_unix` are in the tree by default |
 
-The hide result is a winit limit on Wayland: iced's `window::Mode::Hidden` also
-left its window mapped, so iced only works because its daemon mode can close and
-open windows.
+The hide result looks like a winit limit on Wayland, since iced's
+`window::Mode::Hidden` also left its window mapped, and iced works only because
+its daemon mode can close and open windows. Other ways for egui (minimising,
+more than one viewport, starting `run_native` again) were not tried.
 
 Two checks decided more than the numbers:
 
@@ -149,13 +150,15 @@ says. The UI and the tray come in a later release, on the toolkit above.
   built-in tray and a native Wayland window. It is rejected as the default for
   the cost of its web stack: a second language and a frontend toolchain beside
   `just` and the Nix shell, WebKitGTK as a runtime dependency on Linux (139 MB
-  resident at start against 76 MB for iced), seven MPL-2.0 crates, and a
+  resident at start, against 76 MB for the bare iced spike and 86 MB for iced
+  with the tray and a text field), seven MPL-2.0 crates, and a
   frontend that cannot be checked by clippy. It remains the fallback.
 - **egui.** At 0.37.0 it compiled under the lints, rendered sharply, took
   keyboard input and clipboard, and has AccessKit, which iced lacks. It is
-  rejected as the tray host because it cannot hide its window on Wayland and
-  cannot reopen it, so a tray that shows and hides the settings window needs a
-  tray process of its own that starts the UI on demand. It also bundles fonts
+  rejected as the tray host because, with the approach tested, it cannot hide
+  its window on Wayland or reopen a closed one, so a tray that shows and hides
+  the settings window would need a tray process of its own that starts the UI
+  on demand. It also bundles fonts
   under OFL-1.1 and Ubuntu-font-1.0. The two toolkits are otherwise close, and
   egui is the choice to revisit if iced's missing accessibility matters more
   than hosting the tray in the UI process, or if a separate tray process is
@@ -172,6 +175,16 @@ These were not tested, or were tested only in part, and rest on documentation
 or on the spikes' limits. The decision is revisited if one of them fails for
 iced.
 
+- The second-round figures (RSS of 73 MB and 0.4 s to map for egui 0.37, 86 and
+  78 MB for iced open and closed, the tray calls, hide and show, and the
+  captures) were also not kept as logs, and the captures were overwritten by
+  later ones, so they are observations to repeat.
+- Other ways to hide an egui window on Wayland (minimising, several viewports,
+  calling `run_native` again) were not tried, so "egui cannot host the tray" is
+  true of the tested approach only.
+- The Tauri fallback has no hide-to-tray, input or clipboard evidence: only its
+  tray registration and the deprecation warning were seen. The fonts iced
+  bundles were not checked for licenses.
 - Sharpness at the scale 1.5 of the second monitor: only the output at scale
   1.2 was captured, and the capture was read by eye.
 - Input methods (an IME) and drag and drop, in any toolkit. Typing and
