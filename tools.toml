@@ -60,6 +60,7 @@ items = [
     { title = "v0.3.0", description = "Android: app with the Rust core, clipboard, notification sharing and file transfer", state = "open" },
     { title = "v0.4.0", description = "macOS: daemon and signed bundle, clipboard, mirrored notifications and file transfer", state = "open" },
     { title = "v0.5.0", description = "Windows: daemon and packaging, clipboard with clipboard history, notification sharing and file transfer", state = "open" },
+    { title = "v0.6.0", description = "Sharing with other people's devices", state = "open" },
 ]
 
 # Each form in .github/ISSUE_TEMPLATE/ must carry this label and title prefix.
