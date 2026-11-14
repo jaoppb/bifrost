@@ -81,7 +81,7 @@ Two checks decided more than the numbers:
 
 **Process model.** A headless daemon, a command line client and a separate
 settings UI, with the clients talking to the daemon over local IPC. All three
-are planned and none is built.
+are planned; only a placeholder `bifrostd` crate exists.
 
 - `bifrostd` runs in the user's graphical session and owns the clipboard,
   notifications and the network. On Linux it is started as a systemd user unit
