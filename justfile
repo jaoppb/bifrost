@@ -72,9 +72,10 @@ skills-check:
     done
     [ "$status" -eq 0 ] || { echo "run 'just sync-skills'; skills are edited only under .agents/skills" >&2; exit 1; }
 
-# Print the command mirror of one skill: the skill with its frontmatter turned into a slash command.
+# Print the command mirror of one skill: the skill with its frontmatter turned into a slash command and its
+# reference/ links pointed at the skill directory, since a command in .claude/commands cannot resolve them.
 _skill-mirror name:
-    @awk -v name='{{name}}' 'NR == 1 { next } !done && /^name:/ { next } !done && /^description:/ { desc = $0; next } !done && /^---$/ { done = 1; print "---"; print "name: /" name; print "id: " name; print "category: Development"; print desc; print "---"; next } done { print }' '.agents/skills/{{name}}/SKILL.md'
+    @awk -v name='{{name}}' 'NR == 1 { next } !done && /^name:/ { next } !done && /^description:/ { desc = $0; next } !done && /^---$/ { done = 1; print "---"; print "name: /" name; print "id: " name; print "category: Development"; print desc; print "---"; next } done { gsub(/\]\(reference\//, "](../../.agents/skills/" name "/reference/"); print }' '.agents/skills/{{name}}/SKILL.md'
 
 # Run the unit, integration and doc tests.
 test:
