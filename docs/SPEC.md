@@ -73,6 +73,26 @@ Version 1 accepts these operating system limits instead of working around them.
 An integration for another system is added only once its issue
 ([#54][i54], [#55][i55], [#56][i56]) shows a public way to do it.
 
+## UI surfaces
+
+These surfaces are planned and none is built. The process model, the toolkit and
+what ships first are decided in
+[ADR 0001](adr/0001-process-model.md): a headless daemon, a command line client
+and a separate settings UI, with the first Linux release (`v0.2.0`) shipping the
+daemon and the command line client only. The desktop UI and tray come in a later
+release.
+
+| Surface | What the user does there | Command line (`v0.2.0`) | Settings UI and tray |
+|---------|--------------------------|-------------------------|----------------------|
+| Pairing | Pairs a device and removes a paired one | yes | later |
+| Devices | Sees which paired devices are reachable | yes | later |
+| Rules | Chooses which notifications are mirrored and what is never sent | config file and command | later |
+| File sending | Sends a file to a device | yes | later |
+| Status | Sees whether sync is running and pauses it | yes | later, in the tray |
+
+Android has its own UI, in Kotlin, decided in its milestone. Visual design is
+not decided here.
+
 ## Privacy
 
 These are target rules: nothing enforces them yet.
@@ -89,7 +109,8 @@ These are target rules: nothing enforces them yet.
   devices, pending [#57][i57].
 - Any server, account or cloud relay of bifrost's own.
 - What the [accepted limits](#accepted-limits) rule out.
-- Architecture and protocol design, and UI design: they belong to the spikes.
+- Architecture and protocol design, and UI design: they belong to the spikes and
+  to the [ADRs](adr/README.md).
 
 ## Open questions
 
@@ -99,8 +120,6 @@ These are target rules: nothing enforces them yet.
   [#21](https://github.com/jaoppb/bifrost/issues/21)
 - What is the crate layout and the adapter template for each system?
   [#23](https://github.com/jaoppb/bifrost/issues/23)
-- Which technology builds the desktop shell and the settings UI?
-  [#24](https://github.com/jaoppb/bifrost/issues/24)
 - Can Android, macOS and Windows integrate with a clipboard history?
   [#54][i54], [#55][i55], [#56][i56]
 - Can bifrost sync with other people's devices?
