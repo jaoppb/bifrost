@@ -18,20 +18,40 @@ toolkit and what the first Linux release ships. The toolkits were compared with
 throwaway builds on 2026-11-14, kept outside the repository, on Hyprland 0.57.2
 (Wayland, two monitors at scales 1.5 and 1.2) with a StatusNotifier watcher
 running. Each build was one window with a button, and Tauri also had a tray
-icon. The numbers below come from those builds.
+icon. The numbers below come from those builds. egui was first built at 0.33.3
+(16 MB, 395 crates, 0.2 s) and rebuilt at 0.37.0, the current release, whose
+default features now include the wgpu renderer and AccessKit. The 0.37 API also
+dropped `run_simple_native`, which the first spike used.
 
 | Toolkit | Version | Release binary | Crates in `Cargo.lock` | RSS after start | Window mapped | Window on Wayland |
 |---------|---------|----------------|------------------------|-----------------|---------------|-------------------|
 | iced | 0.14.0 | 23 MB | 382 | 76 MB | 0.7 s | native |
-| egui (eframe) | 0.33.3 | 16 MB | 395 | 79 MB | 0.2 s | native |
+| egui (eframe) | 0.37.0 | 29 MB | 436 | 73 MB | 0.4 s | native |
 | Slint | 1.18.1 | 27 MB | 561 | 89 MB | 0.3 s | native |
 | Tauri | tauri 2.12.5, wry 0.57.2 | 11 MB | 421 | 139 MB (main process only) | 0.6 s | native |
 
 The tray is a separate question, because only Tauri has one built in. The
 StatusNotifierItem protocol is what Hyprland bars (Waybar and others) read, and
 Hyprland itself has no tray. Tauri registered its icon with the watcher. The
-`ksni` crate 0.3.7 (84 crates, 6 MB binary) registered an item too, as a
-binary of its own. It was not combined with any toolkit.
+`ksni` crate 0.3.7 (84 crates, 6 MB binary) works next to iced and egui: a
+second round of spikes put it in each of them, with a window that carries a
+text field and a button.
+
+That round also tested what a settings UI does on Hyprland, on a Wayland output
+at scale 1.2, with iced 0.14.0 and egui 0.37.0:
+
+| Check | iced | egui |
+|-------|------|------|
+| Window sharp at the output's physical resolution (a `grim` capture of 940 by 360 pixels for a 784 by 300 logical area) | yes | yes |
+| Application id read by Hyprland window rules (`class` in `hyprctl clients`) | set through `platform_specific.application_id` | set through `with_app_id` |
+| Typing, paste with non-ASCII text and copy, through `ydotool` and `wl-copy` | works | works |
+| Tray activation and menu entries, called over D-Bus as a bar does | `Activate` shows the window, `Event` runs Show and Quit | `Activate` runs the handler |
+| Hide the window to the tray and show it again | works in `iced::daemon` mode: the window is closed and reopened, the process stays up (86 MB open, 78 MB closed) | does not work: `ViewportCommand::Visible(false)` leaves the window mapped, and `eframe` has no way to reopen a closed window in the same process |
+| Accessibility | no AccessKit in the dependency tree | AccessKit and `accesskit_unix` are in the tree by default |
+
+The hide result is a winit limit on Wayland: iced's `window::Mode::Hidden` also
+left its window mapped, so iced only works because its daemon mode can close and
+open windows.
 
 Two checks decided more than the numbers:
 
@@ -40,21 +60,21 @@ Two checks decided more than the numbers:
   generated code carries `allow(unsafe_code)` and `allow(missing_docs)`, and
   rustc refuses both under `forbid` (error E0453), so a crate that includes it
   cannot opt in to the workspace lints. The generated code of Tauri's
-  `generate_context!` and the code of iced and egui compiled under the same
-  lints with clippy pedantic and nursery on, apart from lints in the spike's own
-  code.
+  `generate_context!` and the code of iced and egui (0.37.0 too) compiled under
+  the same lints with clippy pedantic and nursery on, apart from lints in the
+  spike's own code.
 - **The dependency policy.** `cargo deny check licenses` with the repository
   `deny.toml` rejected these licenses in the spikes: BSL-1.0 (two crates,
   `clipboard-win` and `error-code`, reached through iced, egui and Slint on
   Windows only), Unlicense (`ksni` itself, and a Slint crate), CC0-1.0 (iced),
-  OFL-1.1 and Ubuntu-font-1.0 (egui's bundled fonts), MPL-2.0 (seven crates in
-  Tauri) and, for Slint, a choice of GPL-3.0-only, the Slint royalty-free
-  license or a commercial one. The policy allows permissive licenses only, so
-  each of these (several are not permissive: MPL-2.0 is weak copyleft and the
-  font licenses are not code licenses) needs an exception added to `deny.toml`
-  with a reason, in the pull request that adds the dependency. Slint is the only
-  option whose license has to be chosen, and the terms of its royalty-free
-  license were read from its license text, not tested.
+  OFL-1.1 and Ubuntu-font-1.0 (egui's bundled fonts, at 0.33.3 and 0.37.0),
+  MPL-2.0 (seven crates in Tauri) and, for Slint, a choice of GPL-3.0-only, the
+  Slint royalty-free license or a commercial one. The policy allows permissive
+  licenses only, so each of these (several are not permissive: MPL-2.0 is weak
+  copyleft and the font licenses are not code licenses) needs an exception added
+  to `deny.toml` with a reason, in the pull request that adds the dependency.
+  Slint is the only option whose license has to be chosen, and the terms of its
+  royalty-free license were read from its license text, not tested.
 
 ## Decision
 
@@ -70,15 +90,20 @@ are planned and none is built.
   process that applies settings. Settings come from the config file, which the
   daemon reads and reloads, and from commands that the daemon writes into it.
 - The UI process hosts the tray. On Linux the tray speaks StatusNotifierItem.
-  Closing the settings window leaves the daemon untouched.
+  Closing the settings window leaves the daemon untouched, and with iced it
+  closes the window while the UI process stays up for the tray (`iced::daemon`).
 
 **Local IPC.** A local socket owned by the user: a Unix domain socket under
 `$XDG_RUNTIME_DIR` on Linux, a user-private directory to be chosen on macOS
 (which defines no `XDG_RUNTIME_DIR`), and a named pipe on Windows, through one
-cross-platform crate (`interprocess`, 2.4.8 is current). The socket's
-permissions are meant to be the only authentication, on the assumption that the
-socket is private to the user. The message format and the commands are left to
-the protocol design and to the crate layout spike
+cross-platform crate (`interprocess`, 2.4.8 is current). On Linux the socket is
+a file path, never an abstract name: a spike with `interprocess` created the
+socket file with mode `rwxr-xr-x`, inside a runtime directory of mode
+`rwx------`, so the private directory is what keeps other users out. An abstract
+socket has no file and no permissions at all. The directory permission is meant
+to be the only authentication on Linux, on the assumption that nothing else of
+the user connects. The message format and the commands are left to the protocol
+design and to the crate layout spike
 ([#23](https://github.com/jaoppb/bifrost/issues/23)). This record fixes only
 that the daemon is the server and that the clients are interchangeable.
 
@@ -89,8 +114,7 @@ Tauri 2 is the fallback if the unverified points below fail for iced.
 **First Linux release.** `v0.2.0` ships the daemon and the command line client
 only. Pairing, devices, file sending and status go through the command line, and
 rules also through a config file, as the surfaces table in the specification
-says. The UI
-and the tray come in a later release, on the toolkit above.
+says. The UI and the tray come in a later release, on the toolkit above.
 
 ## Consequences
 
@@ -127,10 +151,15 @@ and the tray come in a later release, on the toolkit above.
   `just` and the Nix shell, WebKitGTK as a runtime dependency on Linux (139 MB
   resident at start against 76 MB for iced), seven MPL-2.0 crates, and a
   frontend that cannot be checked by clippy. It remains the fallback.
-- **egui.** It started fastest (0.2 s) and compiled under the lints. It is
-  immediate mode, which suits tools and debug panels better than forms with
-  validation, and it bundles fonts under OFL-1.1 and Ubuntu-font-1.0. It was
-  tested at 0.33.3 while 0.37 is current.
+- **egui.** At 0.37.0 it compiled under the lints, rendered sharply, took
+  keyboard input and clipboard, and has AccessKit, which iced lacks. It is
+  rejected as the tray host because it cannot hide its window on Wayland and
+  cannot reopen it, so a tray that shows and hides the settings window needs a
+  tray process of its own that starts the UI on demand. It also bundles fonts
+  under OFL-1.1 and Ubuntu-font-1.0. The two toolkits are otherwise close, and
+  egui is the choice to revisit if iced's missing accessibility matters more
+  than hosting the tray in the UI process, or if a separate tray process is
+  accepted.
 - **A UI in the first Linux release.** It would put the toolkit, packaging and
   tray risk on the critical path of `v0.2.0`, for users who run Hyprland and are
   comfortable with a command line and a config file.
@@ -139,38 +168,36 @@ and the tray come in a later release, on the toolkit above.
 
 ## Unverified
 
-These were not tested on Hyprland and rest on documentation or on the spikes'
-limits. The decision is revisited if one of them fails for iced.
+These were not tested, or were tested only in part, and rest on documentation
+or on the spikes' limits. The decision is revisited if one of them fails for
+iced.
 
-- Whether the windows render sharply at the fractional scales 1.5 and 1.2.
-  Only that the windows map natively on Wayland was checked, not their pixels.
-- Keyboard input, input methods, and clipboard and drag and drop inside any of
-  the toolkits.
-- Tray clicks and menus. Only that an item registers with the watcher was
-  checked, for Tauri and for `ksni`, not an activation.
+- Sharpness at the scale 1.5 of the second monitor: only the output at scale
+  1.2 was captured, and the capture was read by eye.
+- Input methods (an IME) and drag and drop, in any toolkit. Typing and
+  clipboard were tested with synthetic key events, and the first click into
+  the iced field only focused its window.
+- Tray clicks from a real bar. Activation and menu entries were called over
+  D-Bus, which is the interface a bar uses, not through a bar.
+- A screen reader. egui ships AccessKit and iced does not, and neither was
+  tried with a screen reader.
+- CJK text. This machine has no Japanese font, so neither toolkit's fallback
+  was seen.
+- The systemd user unit was tested as a transient unit tied to
+  `graphical-session.target`, where `WAYLAND_DISPLAY` was already imported into
+  the user manager. Whether other Hyprland setups import it is unknown.
 - Posting notifications from a headless `bifrostd` on macOS and Windows, where
   the issue says an application identity (a signed bundle on macOS) is needed.
 - The Tauri tray went through `libayatana-appindicator`, which warned that it
   is deprecated, so the Tauri fallback tray is not settled either.
-- Hosting the `ksni` tray from the iced process: the two were never built
-  together.
-- Hiding the iced window and keeping the process alive as a tray host, and
-  whether the iced window can set the application id Hyprland rules match on
-  (the iced, egui and Slint spikes mapped with an empty class).
-- Accessibility (screen readers) in iced.
 - Every claim about macOS and Windows: tray crates, the named pipe through
-  `interprocess` and the packaging. The Linux builds are the only ones made.
-- The socket's permissions as the only authentication, the macOS socket
-  location and the default access of a Windows named pipe.
-- The Slint license terms, read from its text only.
-- The window, memory, Wayland and tray-registration figures were read from
-  `hyprctl -j clients`, `/proc/<pid>/status` and `busctl --user
+  `interprocess`, the macOS socket location, the default access of a Windows
+  named pipe and the packaging. Only a Linux target was built.
+- The Slint license terms, read from their text only.
+- The first-round figures (window, memory, Wayland and tray registration) were
+  read from `hyprctl -j clients`, `/proc/<pid>/status` and `busctl --user
   get-property org.kde.StatusNotifierWatcher /StatusNotifierWatcher
   org.kde.StatusNotifierWatcher RegisteredStatusNotifierItems` while each spike
   ran. Those outputs were not kept as logs, so they are observations to repeat,
-  not records.
-- The systemd user unit and the local socket were not built, and
-  `interprocess` was not compiled.
-- Build times were recorded but not compared, because the five spike builds
-  (four toolkits and `ksni`) ran at once, and the RSS is one sample taken at
-  window start.
+  not records. Build times were recorded but not compared, because the spike
+  builds ran at once, and the RSS is one sample taken at window start.
