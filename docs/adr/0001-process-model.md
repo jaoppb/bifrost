@@ -27,14 +27,14 @@ dropped `run_simple_native`, which the first spike used.
 |---------|---------|----------------|------------------------|-----------------|---------------|-------------------|
 | iced | 0.14.0 | 23 MB | 382 | 76 MB | 0.7 s | native |
 | egui (eframe) | 0.37.0 | 29 MB | 436 | 73 MB | 0.4 s | native |
-| Slint | 1.18.1 | 27 MB | 561 | 89 MB | 0.3 s | native |
+| Slint | 1.18.1 | 27 MB | 561 (includes `ksni`) | 89 MB | 0.3 s | native |
 | Tauri | tauri 2.12.5, wry 0.57.2 | 11 MB | 421 | 139 MB (main process only) | 0.6 s | native |
 
 The tray is a separate question, because only Tauri has one built in. The
 StatusNotifierItem protocol is what Hyprland bars (Waybar and others) read, and
 Hyprland itself has no tray. Tauri registered its icon with the watcher. The
-`ksni` crate 0.3.7 (84 crates, 6 MB binary) works next to iced and egui: a
-second round of spikes put it in each of them, with a window that carries a
+`ksni` crate 0.3.7 (84 crates, 6 MB binary) was put next to iced and egui in a
+second round of spikes, in each of them, with a window that carries a
 text field and a button.
 
 That round also tested what a settings UI does on Hyprland, on a Wayland output
@@ -133,8 +133,8 @@ says. The UI and the tray come in a later release, on the toolkit above.
   system's.
 - Android is outside this decision: its UI is Kotlin, in the Android milestone.
 - Dependency exceptions the iced route will need: BSL-1.0, CC0-1.0, Unlicense
-  (`ksni`) and the licenses of whatever fonts are bundled, each added in the
-  pull request that introduces the UI.
+  (`ksni`) and the licenses of the fonts it bundles, which were not checked,
+  each added in the pull request that introduces the UI.
 
 ## Rejected options
 
@@ -154,13 +154,14 @@ says. The UI and the tray come in a later release, on the toolkit above.
   with the tray and a text field), seven MPL-2.0 crates, and a
   frontend that cannot be checked by clippy. It remains the fallback.
 - **egui.** At 0.37.0 it compiled under the lints, rendered sharply, took
-  keyboard input and clipboard, and has AccessKit, which iced lacks. It is
-  rejected as the tray host because, with the approach tested, it cannot hide
-  its window on Wayland or reopen a closed one, so a tray that shows and hides
-  the settings window would need a tray process of its own that starts the UI
-  on demand. It also bundles fonts
-  under OFL-1.1 and Ubuntu-font-1.0. The two toolkits are otherwise close, and
-  egui is the choice to revisit if iced's missing accessibility matters more
+  keyboard input and clipboard, and has AccessKit, which the iced spike's
+  dependency tree did not. It is rejected as the tray host on one negative
+  result: hiding with `ViewportCommand::Visible(false)` left the window mapped,
+  and no way to reopen a closed window was found. Other ways were not tried (see
+  Unverified). A tray that shows and hides the settings window would otherwise
+  need a tray process of its own that starts the UI on demand. It also bundles
+  fonts under OFL-1.1 and Ubuntu-font-1.0. The two toolkits are otherwise close,
+  and egui is the choice to revisit if iced's missing accessibility matters more
   than hosting the tray in the UI process, or if a separate tray process is
   accepted.
 - **A UI in the first Linux release.** It would put the toolkit, packaging and
@@ -175,10 +176,14 @@ These were not tested, or were tested only in part, and rest on documentation
 or on the spikes' limits. The decision is revisited if one of them fails for
 iced.
 
-- The second-round figures (RSS of 73 MB and 0.4 s to map for egui 0.37, 86 and
-  78 MB for iced open and closed, the tray calls, hide and show, and the
-  captures) were also not kept as logs, and the captures were overwritten by
-  later ones, so they are observations to repeat.
+- Results observed in the spikes with no log kept, so they are observations to
+  repeat and not records: the second-round figures (RSS of 73 MB and 0.4 s to
+  map for egui 0.37, 86 and 78 MB for iced open and closed, the tray calls, hide
+  and show, and the captures, which later ones overwrote); the socket mode
+  `rwxr-xr-x` in a `rwx------` directory; the `cargo deny` license results for
+  every toolkit; the clippy results for egui 0.37 and iced; and the egui 0.33.3
+  figures, whose lock file was overwritten at 0.37. The typing and paste
+  results are kept in the spikes' stdout logs.
 - Other ways to hide an egui window on Wayland (minimising, several viewports,
   calling `run_native` again) were not tried, so "egui cannot host the tray" is
   true of the tested approach only.
