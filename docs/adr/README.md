@@ -12,7 +12,7 @@ it is built the way it is.
   record supersedes it, and both link to each other.
 - Status is `proposed`, `accepted` or `superseded by NNNN`.
 - A record is added with the first decision that needs one, usually from a
-  `type:spike` issue. Nothing checks a record, so review is the only enforcer.
+  `type:spike` issue. None of these rules has a check: all are `review-only`.
 
 ## Index
 

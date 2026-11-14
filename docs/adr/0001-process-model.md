@@ -25,7 +25,7 @@ icon. The numbers below come from those builds.
 | iced | 0.14.0 | 23 MB | 382 | 76 MB | 0.7 s | native |
 | egui (eframe) | 0.33.3 | 16 MB | 395 | 79 MB | 0.2 s | native |
 | Slint | 1.18.1 | 27 MB | 561 | 89 MB | 0.3 s | native |
-| Tauri | tauri 2.12.5, wry 0.57.2 | 11 MB | 421 | 139 MB | 0.6 s | native |
+| Tauri | tauri 2.12.5, wry 0.57.2 | 11 MB | 421 | 139 MB (main process only) | 0.6 s | native |
 
 The tray is a separate question, because only Tauri has one built in. The
 StatusNotifierItem protocol is what Hyprland bars (Waybar and others) read, and
@@ -49,10 +49,12 @@ Two checks decided more than the numbers:
   Windows only), Unlicense (`ksni` itself, and a Slint crate), CC0-1.0 (iced),
   OFL-1.1 and Ubuntu-font-1.0 (egui's bundled fonts), MPL-2.0 (seven crates in
   Tauri) and, for Slint, a choice of GPL-3.0-only, the Slint royalty-free
-  license or a commercial one. A permissive license is added per dependency,
-  with a reason, in the pull request that adds it. Slint is the only option
-  whose license has to be chosen, and the terms of its royalty-free license were
-  read from its license text, not tested.
+  license or a commercial one. The policy allows permissive licenses only, so
+  each of these (several are not permissive: MPL-2.0 is weak copyleft and the
+  font licenses are not code licenses) needs an exception added to `deny.toml`
+  with a reason, in the pull request that adds the dependency. Slint is the only
+  option whose license has to be chosen, and the terms of its royalty-free
+  license were read from its license text, not tested.
 
 ## Decision
 
@@ -64,7 +66,9 @@ are planned and none is built.
   notifications and the network. On Linux it is started as a systemd user unit
   tied to the graphical session. It runs with no UI installed.
 - The command line client and the UI are thin clients. They hold no state of
-  their own, and the daemon is the only writer of settings and pairing state.
+  their own, and the daemon is the only writer of pairing state and the only
+  process that applies settings. Settings come from the config file, which the
+  daemon reads and reloads, and from commands that the daemon writes into it.
 - The UI process hosts the tray. On Linux the tray speaks StatusNotifierItem.
   Closing the settings window leaves the daemon untouched.
 
@@ -143,6 +147,10 @@ limits. The decision is revisited if one of them fails for iced.
   the toolkits.
 - Tray clicks and menus. Only that an item registers with the watcher was
   checked, for Tauri and for `ksni`, not an activation.
+- Posting notifications from a headless `bifrostd` on macOS and Windows, where
+  the issue says an application identity (a signed bundle on macOS) is needed.
+- The Tauri tray went through `libayatana-appindicator`, which warned that it
+  is deprecated, so the Tauri fallback tray is not settled either.
 - Hosting the `ksni` tray from the iced process: the two were never built
   together.
 - Hiding the iced window and keeping the process alive as a tray host, and
@@ -162,5 +170,5 @@ limits. The decision is revisited if one of them fails for iced.
   not records.
 - The systemd user unit and the local socket were not built, and
   `interprocess` was not compiled.
-- Build times were not recorded, because the five builds ran at once, and the
-  RSS is one sample taken at window start.
+- Build times were not recorded, because the five spike builds (four toolkits
+  and `ksni`) ran at once, and the RSS is one sample taken at window start.
