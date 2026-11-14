@@ -11,8 +11,8 @@ it is built the way it is.
 - A record is not edited after it is accepted, except for its status. A later
   record supersedes it, and both link to each other.
 - Status is `proposed`, `accepted` or `superseded by NNNN`.
-- Decisions come from `type:spike` issues and are added with the first decision
-  that needs one. Nothing checks a record, so review is the only enforcer.
+- A record is added with the first decision that needs one, usually from a
+  `type:spike` issue. Nothing checks a record, so review is the only enforcer.
 
 ## Index
 

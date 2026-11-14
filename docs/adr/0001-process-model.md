@@ -25,13 +25,13 @@ icon. The numbers below come from those builds.
 | iced | 0.14.0 | 23 MB | 382 | 76 MB | 0.7 s | native |
 | egui (eframe) | 0.33.3 | 16 MB | 395 | 79 MB | 0.2 s | native |
 | Slint | 1.18.1 | 27 MB | 561 | 89 MB | 0.3 s | native |
-| Tauri (wry) | 2.12.5 (0.57.2) | 11 MB | 421 | 139 MB | 0.6 s | native |
+| Tauri | tauri 2.12.5, wry 0.57.2 | 11 MB | 421 | 139 MB | 0.6 s | native |
 
 The tray is a separate question, because only Tauri has one built in. The
 StatusNotifierItem protocol is what Hyprland bars (Waybar and others) read, and
 Hyprland itself has no tray. Tauri registered its icon with the watcher. The
-`ksni` crate 0.3.7 (84 crates, 6 MB binary) registered an item too, and it works
-next to iced, egui or Slint.
+`ksni` crate 0.3.7 (84 crates, 6 MB binary) registered an item too, as a
+binary of its own. It was not combined with any toolkit.
 
 Two checks decided more than the numbers:
 
@@ -46,13 +46,13 @@ Two checks decided more than the numbers:
 - **The dependency policy.** `cargo deny check licenses` with the repository
   `deny.toml` rejected these licenses in the spikes: BSL-1.0 (two crates,
   `clipboard-win` and `error-code`, reached through iced, egui and Slint on
-  Windows only), CC0-1.0 (iced), OFL-1.1 and Ubuntu-font-1.0 (egui's bundled
-  fonts), MPL-2.0 (seven crates in Tauri) and, for Slint, a choice of
-  GPL-3.0-only, the Slint royalty-free license or a commercial one. A permissive
-  license is added per dependency, with a reason, in the pull request that adds
-  it. A UI that is MIT or Apache-2.0 and ships on four systems fits the Slint
-  royalty-free terms only with their attribution requirement, and Slint is also
-  the only option whose license has to be chosen.
+  Windows only), Unlicense (`ksni` itself, and a Slint crate), CC0-1.0 (iced),
+  OFL-1.1 and Ubuntu-font-1.0 (egui's bundled fonts), MPL-2.0 (seven crates in
+  Tauri) and, for Slint, a choice of GPL-3.0-only, the Slint royalty-free
+  license or a commercial one. A permissive license is added per dependency,
+  with a reason, in the pull request that adds it. Slint is the only option
+  whose license has to be chosen, and the terms of its royalty-free license were
+  read from its license text, not tested.
 
 ## Decision
 
@@ -69,11 +69,12 @@ are planned and none is built.
   Closing the settings window leaves the daemon untouched.
 
 **Local IPC.** A local socket owned by the user: a Unix domain socket under
-`$XDG_RUNTIME_DIR` on Linux and macOS, and a named pipe on Windows, through one
+`$XDG_RUNTIME_DIR` on Linux, a user-private directory to be chosen on macOS
+(which defines no `XDG_RUNTIME_DIR`), and a named pipe on Windows, through one
 cross-platform crate (`interprocess`, 2.4.8 is current). The socket's
-permissions are the only authentication, which is enough because the socket is
-private to the user. The message format and the commands are left to the
-protocol design and to the crate layout spike
+permissions are meant to be the only authentication, on the assumption that the
+socket is private to the user. The message format and the commands are left to
+the protocol design and to the crate layout spike
 ([#23](https://github.com/jaoppb/bifrost/issues/23)). This record fixes only
 that the daemon is the server and that the clients are interchangeable.
 
@@ -82,8 +83,9 @@ on Linux. The tray for macOS and Windows is chosen when those milestones start.
 Tauri 2 is the fallback if the unverified points below fail for iced.
 
 **First Linux release.** `v0.2.0` ships the daemon and the command line client
-only. Pairing, status and rules go through the command line and a config file.
-The UI and the tray come in a later release, on the toolkit above.
+only. Pairing, devices, rules, file sending and status go through the command
+line and a config file, as the surfaces table in the specification says. The UI
+and the tray come in a later release, on the toolkit above.
 
 ## Consequences
 
@@ -100,9 +102,9 @@ The UI and the tray come in a later release, on the toolkit above.
   tray crate of its own and a UI that draws its own widgets instead of using the
   system's.
 - Android is outside this decision: its UI is Kotlin, in the Android milestone.
-- Dependency exceptions the iced route will need: BSL-1.0, CC0-1.0 and the
-  licenses of whatever fonts are bundled, each added in the pull request that
-  introduces the UI.
+- Dependency exceptions the iced route will need: BSL-1.0, CC0-1.0, Unlicense
+  (`ksni`) and the licenses of whatever fonts are bundled, each added in the
+  pull request that introduces the UI.
 
 ## Rejected options
 
@@ -141,12 +143,23 @@ limits. The decision is revisited if one of them fails for iced.
   the toolkits.
 - Tray clicks and menus. Only that an item registers with the watcher was
   checked, for Tauri and for `ksni`, not an activation.
+- Hosting the `ksni` tray from the iced process: the two were never built
+  together.
 - Hiding the iced window and keeping the process alive as a tray host, and
   whether the iced window can set the application id Hyprland rules match on
   (the iced, egui and Slint spikes mapped with an empty class).
 - Accessibility (screen readers) in iced.
 - Every claim about macOS and Windows: tray crates, the named pipe through
   `interprocess` and the packaging. The Linux builds are the only ones made.
+- The socket's permissions as the only authentication, the macOS socket
+  location and the default access of a Windows named pipe.
+- The Slint license terms, read from its text only.
+- The window, memory, Wayland and tray-registration figures were read from
+  `hyprctl -j clients`, `/proc/<pid>/status` and `busctl --user
+  get-property org.kde.StatusNotifierWatcher /StatusNotifierWatcher
+  org.kde.StatusNotifierWatcher RegisteredStatusNotifierItems` while each spike
+  ran. Those outputs were not kept as logs, so they are observations to repeat,
+  not records.
 - The systemd user unit and the local socket were not built, and
   `interprocess` was not compiled.
 - Build times were not recorded, because the five builds ran at once, and the
