@@ -14,6 +14,6 @@ mod tests {
 
     #[test]
     fn product_name_is_bifrost() {
-        assert_eq!(product_name(), "Heimdall");
+        assert_eq!(product_name(), "Bifrost");
     }
 }
