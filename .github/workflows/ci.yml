@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  # The job name is the required status check in .github/rulesets/main.json: rename both together,
+  # then run `just ruleset`, or every pull request waits for a check that never reports.
+  check:
+    name: check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # cache-nix-action purges superseded Nix store caches.
+      actions: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ github.token }}
+
+      # Keyed on the flake, so a toolchain bump starts a new cache. A key miss starts from an empty
+      # store (no restore by prefix: with no GC, an older store would carry its old toolchain into
+      # every later cache), fetches from cache.nixos.org, saves the new store and purges the older
+      # entries. No GC before saving: nothing roots the devShell closure, so a GC would drop it.
+      - name: Restore and save the Nix store
+        uses: nix-community/cache-nix-action@v7
+        with:
+          primary-key: nix-devshell-${{ runner.os }}-${{ hashFiles('flake.nix', 'flake.lock') }}
+          purge: true
+          purge-prefixes: nix-devshell-${{ runner.os }}-
+          purge-created: 0
+          purge-primary-key: never
+
+      # Cargo downloads only: the registry, git checkouts and the advisory database. target/ is never
+      # cached, so every run compiles from clean and a stale artifact cannot hide a failure.
+      - name: Restore and save the cargo downloads
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
+            ~/.cargo/advisory-dbs
+          key: cargo-${{ runner.os }}-${{ hashFiles('Cargo.lock', 'rust-toolchain.toml', 'flake.lock') }}
+          restore-keys: |
+            cargo-${{ runner.os }}-
+
+      - name: Run just check
+        run: nix develop --command just check

@@ -28,11 +28,12 @@ fmt-check:
 clippy:
     cargo clippy --workspace --all-targets --all-features -- -D warnings
 
-# Run clippy, then check the dependency policy, the crate boundaries and the skill mirrors.
+# Run clippy, then check the dependency policy, the crate boundaries, the skill mirrors and the workflows.
 lint: clippy
     just deny
     just arch
     just skills-check
+    actionlint
 
 # Check the crate boundaries: arch-lint on the sources and a guard on the Cargo graph.
 arch:
