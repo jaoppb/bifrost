@@ -6,8 +6,8 @@ canonical when the two differ.
 
 ## Setup
 
-Bifrost builds inside a Nix flake dev shell, so every machine, git hook and
-later CI run uses the same toolchain.
+Bifrost builds inside a Nix flake dev shell, so every machine, git hook and CI
+run uses the same toolchain.
 
 - Install [Nix](https://nixos.org/) with flakes enabled.
 - Optionally install [direnv](https://direnv.net/), so `.envrc` enters the dev
@@ -35,7 +35,7 @@ AGENTS.md section 6 describes each one.
 |--------|------|
 | `just fmt` | Formats Rust and Markdown in place |
 | `just sync-skills` | Regenerate the `.claude/commands` mirrors after editing a skill in `.agents/skills` |
-| `just check` | Format check, clippy, the dependency policy, the crate boundaries, the skill mirrors and the tests |
+| `just check` | Format check, clippy, the dependency policy, the crate boundaries, the skill mirrors, `actionlint` and the tests |
 
 `just check` must pass with zero lint exceptions before a pull request is
 opened: there are no `allow` attributes (checked) and no `expect` attributes
@@ -106,7 +106,8 @@ epic with a commit.
 
 - Title the pull request like a commit: `<type>: <summary> (#<issue>)`.
 - Fill the template: `Closes #<issue>`, What, Notes and Test plan.
-- Run `just check` first. There is no CI yet, so the local run is the gate.
+- Run `just check` first. CI runs it again, and the pull request merges only
+  when that run passes on a branch up to date with `main`.
 
 The repository merges with merge commits only, and the pull request title and
 body become the merge message. That is why every commit on the branch follows

@@ -28,11 +28,12 @@ fmt-check:
 clippy:
     cargo clippy --workspace --all-targets --all-features -- -D warnings
 
-# Run clippy, then check the dependency policy, the crate boundaries and the skill mirrors.
+# Run clippy, then check the dependency policy, the crate boundaries, the skill mirrors and the workflows.
 lint: clippy
     just deny
     just arch
     just skills-check
+    actionlint
 
 # Check the crate boundaries: arch-lint on the sources and a guard on the Cargo graph.
 arch:
@@ -104,3 +105,18 @@ project-check:
 # Write the planned Project Status moves to the GitHub Project.
 project-sync:
     tools project sync
+
+# Create or update the ruleset on main from .github/rulesets/main.json (writes to GitHub; needs admin).
+ruleset:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    file=.github/rulesets/main.json
+    name=$(jq -r .name "$file")
+    id=$(gh api 'repos/{owner}/{repo}/rulesets' | jq -r --arg name "$name" '.[] | select(.name == $name) | .id')
+    if [ -n "$id" ]; then
+        gh api --method PUT "repos/{owner}/{repo}/rulesets/$id" --input "$file" > /dev/null
+        echo "updated ruleset '$name' ($id)"
+    else
+        gh api --method POST 'repos/{owner}/{repo}/rulesets' --input "$file" > /dev/null
+        echo "created ruleset '$name'"
+    fi

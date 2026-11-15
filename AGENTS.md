@@ -13,10 +13,11 @@ Project is set up.
   never renumbered, because other documents and skills cite them by number.
 - This file is canonical: other documents summarise a rule and link here.
   Every rule here names its enforcer or is marked `review-only`.
-- Status values: `enforced now` (a check runs in `just check` or in a git hook
-  today), `enforced by hand` (a command checks it, but it needs a login or
-  network, so it is not part of `just check`) or `review-only` (no tool checks
-  it, with the reason). A status may add `locally`: only the git hooks run it.
+- Status values: `enforced now` (a check runs in `just check`, in a git hook or
+  on GitHub today), `enforced by hand` (a command checks it, but it needs a
+  login or network, so it is not part of `just check`) or `review-only` (no tool
+  checks it, with the reason). A status may add `locally`: only the git hooks
+  run it.
 - Never claim a check that does not run. Where an enforcer is missing, the
   status says so.
 - There are no lint exceptions: no `allow` or `expect` attributes and no
@@ -102,10 +103,12 @@ are in `just test`.
   `.github/pull_request_template.md`: `Closes #<issue>`, What, Notes and Test
   plan. A pull request that only says `Refs #<n>` is not linked to the issue, so
   its card is moved by hand.
-- **Merging** creates a merge commit and nothing else: squash and rebase are
-  off, the pull request title and body become the merge message, and the branch
-  is deleted on merge. Every commit of the branch therefore reaches `main`, so
-  each one follows the commit rule.
+- **Merging** goes through a pull request whose `check` job (CI runs
+  `just check`) passes on a branch up to date with `main`. It creates a merge
+  commit and nothing else: squash and rebase are off, the pull request title and
+  body become the merge message, and the branch is deleted on merge. Every
+  commit of the branch therefore reaches `main`, so each one follows the commit
+  rule.
 - **SPDD.** An issue with Effort 5 or more follows Structured Prompt-Driven
   Development before code is written. Its analysis is appended to the issue body
   and is the gate: no code before the analysis exists. Its canvas is a local
@@ -136,7 +139,8 @@ are in `just test`.
 | Commit titles are conventional commits | lefthook `commit-msg` hook runs `convco`; git-generated titles (merge, revert, fixup, squash, amend) are skipped | enforced now, locally |
 | Every change is tied to one issue, and a branch finishes at most one | Code review | review-only: no check reads the issue of a change |
 | The `(#<issue>)` suffix, the branch name and `Closes #` in the pull request | Code review | review-only: no check reads them |
-| Code and Markdown are formatted and linted before a commit, and the full gate runs before a push | lefthook `pre-commit` (`just fmt-check`, `just clippy`) and `pre-push` (`just check`), installed by `just setup` | enforced now, locally; `--no-verify` skips them, and there is no CI yet |
+| Code and Markdown are formatted and linted before a commit, and the full gate runs before a push | lefthook `pre-commit` (`just fmt-check`, `just clippy`) and `pre-push` (`just check`), installed by `just setup` | enforced now, locally; `--no-verify` skips them, and CI runs `just check` again |
+| A pull request merges into `main` only when the `check` job passes on a branch up to date with `main`, with merge commits only and no direct pushes; an admin may bypass on a pull request | The `check` job in `.github/workflows/ci.yml` runs `just check`; the ruleset in `.github/rulesets/main.json` requires it and is applied by `just ruleset` | enforced now, on GitHub; `just ruleset` is run by hand, so the live ruleset can drift from the file |
 | Merge commits only, the pull request title and body as the merge message, the branch deleted on merge | `[github.repository.settings]` in `tools.toml`, compared by `just repo-check` | enforced by hand |
 | Markdown is formatted and linted | `rumdl` through `just fmt-check` | enforced now |
 | An issue with Effort 5 or more has its analysis before code | Code review | review-only: the analysis lives in the issue body, which `just check` cannot reach |
@@ -158,7 +162,7 @@ with `.envrc`) and fail with a clear message outside it.
 | `just fmt` | Format Rust and Markdown in place |
 | `just fmt-check` | Fail if Rust or Markdown is not formatted |
 | `just clippy` | Run clippy on the whole workspace, warnings as errors |
-| `just lint` | Run clippy, then the dependency policy, the crate boundaries and the skill mirrors |
+| `just lint` | Run clippy, then the dependency policy, the crate boundaries, the skill mirrors and `actionlint` on the workflows |
 | `just arch` | Check the crate boundaries: arch-lint on the sources and the Cargo graph |
 | `just deny` | Check advisories, licenses, bans and sources with `cargo deny`; the advisory database is fetched first and the cached copy is used when that fails |
 | `just sync-skills` | Regenerate the `.claude/commands` mirrors from `.agents/skills` |
@@ -170,6 +174,7 @@ with `.envrc`) and fail with a clear message outside it.
 | `just repo-sync` | Make the repository settings, labels and milestones match `tools.toml`; writes to GitHub |
 | `just project-check` | Print the planned Project Status moves and write nothing; exits 1 when there are any; needs the `project` scope |
 | `just project-sync` | Write those moves to the Project |
+| `just ruleset` | Create or update the ruleset on `main` from `.github/rulesets/main.json`; writes to GitHub and needs admin |
 
 ## 7. Issue workflow
 
@@ -244,4 +249,4 @@ progress or In review for a new blocker.
 | Labels, milestones and merge settings on GitHub match `tools.toml` | `just repo-check`, and `just repo-sync` to apply | enforced by hand |
 | Open issues have a milestone, one `type:` label, an `area:` label, a parent (epics excepted), a Project card and no blocker cycle; no open issue under a closed parent, and none under or blocking an issue of an earlier release | `just issues-check` | enforced by hand |
 | The Ready gate and the Status of each card | `just project-check` and `just project-sync` | enforced by hand |
-| Hierarchy levels, Priority meaning, Fibonacci Effort values, unestimated epics, dependency links and the SPDD gate | Code review | review-only: GitHub state cannot be reached from `just check`, and no CI exists yet |
+| Hierarchy levels, Priority meaning, Fibonacci Effort values, unestimated epics, dependency links and the SPDD gate | Code review | review-only: GitHub state cannot be reached from `just check`, and CI does not check it |
