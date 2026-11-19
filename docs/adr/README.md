@@ -19,3 +19,5 @@ it is built the way it is.
 | Record | Decision | Status |
 |--------|----------|--------|
 | [0001](0001-process-model.md) | Process model, local IPC, UI toolkit and first Linux release | accepted |
+| [0002](0002-trust-and-pairing.md) | Trust model, pairing and device keys | proposed |
+| [0003](0003-protocol-and-transport.md) | Wire protocol, transport, encoding and payloads | proposed |
