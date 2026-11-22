@@ -1,6 +1,6 @@
 # 0002: Trust model, pairing and device keys
 
-Status: proposed
+Status: accepted
 
 Issue: [#21](https://github.com/jaoppb/bifrost/issues/21)
 
